@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Random;
 
 public class MainGame extends Application {
-    public static int LOBBY_WIDTH = 400;
-    public static int LOBBY_HEIGHT = 300;
+    public static int LOBBY_WIDTH = 1000;
+    public static int LOBBY_HEIGHT = 600;
 
 
     Vector2D offset = new Vector2D(); // if the field (0,0) point was moved
@@ -36,7 +36,7 @@ public class MainGame extends Application {
     Scene lobbyScene;
     BorderPane borderPane = new BorderPane();
     ButtleField buttleField;
-    Scene buttleScene = new Scene(borderPane);
+    Scene buttleScene;
     Stage stage;
 
     Button quit = new Button("Quit");
@@ -55,9 +55,11 @@ public class MainGame extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
+        this.stage.setMinWidth((double) LOBBY_WIDTH / 2);
+        this.stage.setMinHeight((double) LOBBY_HEIGHT / 2);
 
         lobbyPane = new LobbyPane(this);
-        lobbyScene = new Scene(lobbyPane, LOBBY_WIDTH * 2, LOBBY_HEIGHT * 2);
+        lobbyScene = new Scene(lobbyPane, LOBBY_WIDTH, LOBBY_HEIGHT);
 
         lobbyPane.start.setOnMousePressed(e -> lobbyPane.lobbyBtnPressed(e));
         lobbyPane.start.setOnMouseReleased(e -> lobbyPane.lobbyBtnReleased(e));
@@ -91,6 +93,7 @@ public class MainGame extends Application {
 
         buttleField = new ButtleField(this);
         borderPane.setCenter(buttleField);
+        updateFontSize();
 
         borderPane.widthProperty().addListener((observableValue, number, t1) -> {
             updateMargin();
@@ -105,7 +108,9 @@ public class MainGame extends Application {
         });
 
         Timeline animation = new Timeline(new KeyFrame(new Duration(16), e -> {
-            // TODO
+            if (gameState == GameState.LOBBY) {
+                lobbyPane.update();
+            }
         }));
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.play();
@@ -127,7 +132,7 @@ public class MainGame extends Application {
     }
 
     private void updateMargin() {
-        double size = Math.min(borderPane.getWidth(), borderPane.getHeight());
+        double size = Math.min(buttleField.getWidth(), buttleField.getHeight());
         double horizontalMargin = (borderPane.getWidth() - size) / 2.0;
         double verticalMargin = (borderPane.getHeight() - size) / 2.0;
         topPane.setPrefHeight(verticalMargin);
@@ -140,7 +145,10 @@ public class MainGame extends Application {
         if (btn == lobbyPane.start) {
             gameState = GameState.GAME;
             generateField();
+
             stage.setScene(buttleScene);
+            buttleField.setPrefWidth(fieldWidth * DEFAULT_CELL_SIZE);
+            buttleField.setPrefHeight(fieldHeight * DEFAULT_CELL_SIZE);
             buttleField.draw();
         }
         else if (btn == lobbyPane.quit) {

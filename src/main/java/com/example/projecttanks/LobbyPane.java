@@ -18,6 +18,8 @@ public class LobbyPane extends Pane {
 
     public Button start = new Button("Start");
     public Button quit = new Button("Quit");
+    private Rectangle lobbyBG = new Rectangle(0, 0);
+    Text text = new Text("Tanks Battle!");
 
     private final Background lobbyBtnBackground = new Background(new BackgroundFill(Color.DARKGREEN, new CornerRadii(5), null));
     private final Font lobbyBtnFont = Font.font("System", FontWeight.BOLD, 16);
@@ -28,62 +30,54 @@ public class LobbyPane extends Pane {
     private final double lobbyBtnHeight = 50;
     private static final double GAP_BETWEEN_BUTTONS = 50;
 
-    private Rectangle lobbyBG = new Rectangle(0, 0);
 
     LobbyPane(MainGame game) {
         this.game = game;
     }
 
     public void draw() {
-        // Lobby
         if (game.gameState == GameState.LOBBY) {
-            lobbyBG();
-            drawLobbyBtns();
-            drawLobbyText();
+            update();
+
+            game.lobbyPane.getChildren().add(lobbyBG);
+            game.lobbyPane.getChildren().add(start);
+            game.lobbyPane.getChildren().add(quit);
+            game.lobbyPane.getChildren().add(text);
         }
-        // Game field
-//        if (game.gameState == GameState.GAME) {
-//            for (int x = 0; x < game.fieldWidth; x++) {
-//                for (int y = 0; y < game.fieldHeight; y++) {
-//                    getChildren().addAll(game.field[x][y].initElements(game.offset));
-//                }
-//            }
-//        }
-        // Pause message
-        // End info
-
-
     }
 
-    private void lobbyBG() {
-        lobbyBG.widthProperty().bind(game.lobbyPane.widthProperty());
-        lobbyBG.heightProperty().bind(game.lobbyPane.heightProperty());
+    public void update() {
+        colorBG();
+        updateLobbyText();
+        updateAllBtns();
+    }
+
+    private void colorBG() {
         lobbyBG.setFill(Color.rgb(70, 120, 80));
-        game.lobbyPane.getChildren().add(lobbyBG);
+        lobbyBG.setWidth(game.lobbyPane.getWidth());
+        lobbyBG.setHeight(game.lobbyPane.getHeight());
     }
 
-    private void drawLobbyText() {
-        Text text = new Text("Tanks Battle!");
+    private void updateLobbyText() {
         text.setFill(Color.BLACK);
         text.setStrokeWidth(2);
         text.setFont(Font.font("System", FontWeight.BOLD, 50));
         text.setLayoutX(game.lobbyPane.getWidth() / 2 - text.getLayoutBounds().getWidth() / 2);
         text.setLayoutY(game.lobbyPane.getHeight() / 2 - text.getLayoutBounds().getHeight());
-        game.lobbyPane.getChildren().add(text);
     }
 
-    private void drawLobbyBtns(){
-        double shadowGap = 5;
+    private void updateAllBtns(){
+        double posY = game.lobbyPane.getHeight() / 2 - lobbyBtnHeight / 2;
 
         double startPosX = game.lobbyPane.getWidth() / 2 - lobbyBtnWidth - GAP_BETWEEN_BUTTONS / 2;
-        drawBtn(shadowGap, startPosX, start);
+        udateBtn(startPosX, posY, start);
 
         double quitPosX = game.lobbyPane.getWidth() / 2 + GAP_BETWEEN_BUTTONS / 2;
-        drawBtn(shadowGap, quitPosX, quit);
+        udateBtn(quitPosX, posY, quit);
     }
 
-    private void drawBtn(double shadowGap, double posX, Button btn) {
-        double quitPosY = game.lobbyPane.getHeight() / 2 - lobbyBtnHeight / 2;
+    private void udateBtn(double posX, double posY, Button btn) {
+        double shadowGap = 5;
 
         btn.setPrefWidth(lobbyBtnWidth);
         btn.setPrefHeight(lobbyBtnHeight);
@@ -91,9 +85,8 @@ public class LobbyPane extends Pane {
         btn.setFont(lobbyBtnFont);
         btn.setTextFill(lobbyBtnColor);
         btn.setLayoutX(posX - shadowGap);
-        btn.setLayoutY(quitPosY - shadowGap);
+        btn.setLayoutY(posY - shadowGap);
         btn.setEffect(shadow);
-        game.lobbyPane.getChildren().add(btn);
     }
 
     public void lobbyBtnPressed(MouseEvent e) {
@@ -110,4 +103,5 @@ public class LobbyPane extends Pane {
         btn.setEffect(shadow);
         game.btnAction(btn);
     }
+
 }
