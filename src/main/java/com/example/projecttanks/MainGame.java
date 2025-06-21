@@ -26,7 +26,7 @@ public class MainGame extends Application {
 
     Vector2D offset = new Vector2D(); // if the field (0,0) point was moved
     public Cell[][] field;
-    private static int[] dimensions = new int[]{3, 4, 5, 6};
+    private static int[] dimensions = new int[]{3, 4, 5, 6, 7, 8, 9, 10};
     public int fieldWidth;
     public int fieldHeight;
     public double cellSize;
@@ -65,7 +65,7 @@ public class MainGame extends Application {
         lobbyPane.start.setOnMouseReleased(e -> lobbyPane.lobbyBtnReleased(e));
 
         lobbyPane.quit.setOnMousePressed(e -> lobbyPane.lobbyBtnPressed(e));
-        lobbyPane.quit.setOnMouseReleased(e -> lobbyPane.lobbyBtnReleased(e));
+        lobbyPane.quit.setOnMouseReleased(e -> lobbyPane.lobbyBtnReleased(e)); // lobby quit
 
         gameState = GameState.LOBBY;
         lobbyPane.draw();
@@ -83,33 +83,37 @@ public class MainGame extends Application {
 
         bottomPane.setAlignment(Pos.CENTER);
         bottomPane.setSpacing(40);
-        bottomPane.setStyle("-fx-background-color: yellow;");
+        bottomPane.setStyle("-fx-background-color: green;");
 
         borderPane.setBottom(bottomPane);
 
-        leftPane.setStyle("-fx-background-color: yellow;");
+        leftPane.setStyle("-fx-background-color: lightgray;");
         borderPane.setLeft(leftPane);
-        rightPane.setStyle("-fx-background-color: yellow;");
+        rightPane.setStyle("-fx-background-color: lightgray;");
         borderPane.setRight(rightPane);
 
         battleField = new BattleField(this);
         borderPane.setCenter(battleField);
 
         borderPane.widthProperty().addListener((observableValue, number, t1) -> {
+            setCellSize();
+            battleField.update();
             updateMargin();
         });
 
         borderPane.heightProperty().addListener((observableValue, number, t1) -> {
+            setCellSize();
+            battleField.update();
             updateMargin();
         });
 
-        stage.heightProperty().addListener((observableValue, number, t1) -> {
-            updateFontSize();
-        });
+        quit.setOnAction(e -> btnAction(quit)); // game quit
 
         Timeline animation = new Timeline(new KeyFrame(new Duration(16), e -> {
             if (gameState == GameState.LOBBY) {
                 lobbyPane.update();
+            } else if (gameState == GameState.GAME){
+                battleField.update();
             }
         }));
         animation.setCycleCount(Timeline.INDEFINITE);
@@ -130,23 +134,12 @@ public class MainGame extends Application {
             fillUpFieldWithCells();
 
             updateMargin();
-            updateFontSize();
+//            updateFontSize();
             battleField.draw();
         }
-        else if (btn == lobbyPane.quit) {
+        else if (btn == lobbyPane.quit || btn == quit) {
             Platform.exit();
         }
-    }
-
-    private void updateFontSize() {
-        double fontSize = battleField.getHeight() / 25.0;
-        Font font = Font.font(fontSize);
-
-        lbPlayer1.setFont(font);
-        lbTime.setFont(font);
-        lbPlayer2.setFont(font);
-
-        quit.setFont(font);
     }
 
     private void updateMargin() {
@@ -159,8 +152,8 @@ public class MainGame extends Application {
     }
 
     private void setCellSize(){
-        double centralPaneHeight = borderPane.getPrefHeight() - 100;
-        double centralPaneWidth = borderPane.getPrefWidth();
+        double centralPaneHeight = borderPane.getHeight() - 100;
+        double centralPaneWidth = borderPane.getWidth();
         double centralPaneRatio = (double) centralPaneWidth / centralPaneHeight;
 
         double battleFieldRatio = (double) fieldWidth / fieldHeight;
