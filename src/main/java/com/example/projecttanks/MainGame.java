@@ -120,6 +120,24 @@ public class MainGame extends Application {
         stage.show();
     }
 
+    public void btnAction(Button btn){
+        if (btn == lobbyPane.start) {
+            gameState = GameState.GAME;
+            stage.setScene(battleScene);
+
+            generateFieldDimensions();
+            setCellSize();
+            fillUpFieldWithCells();
+
+            updateMargin();
+            updateFontSize();
+            battleField.draw();
+        }
+        else if (btn == lobbyPane.quit) {
+            Platform.exit();
+        }
+    }
+
     private void updateFontSize() {
         double fontSize = battleField.getHeight() / 25.0;
         Font font = Font.font(fontSize);
@@ -138,8 +156,6 @@ public class MainGame extends Application {
         bottomPane.setPrefHeight(verticalMargin);
         leftPane.setPrefWidth(horizontalMargin);
         rightPane.setPrefWidth(horizontalMargin);
-
-        offset = new Vector2D(horizontalMargin, verticalMargin);
     }
 
     private void setCellSize(){
@@ -159,29 +175,16 @@ public class MainGame extends Application {
         }
     }
 
-    public void btnAction(Button btn){
-        if (btn == lobbyPane.start) {
-            gameState = GameState.GAME;
-            generateField();
-            stage.setScene(battleScene);
-            setCellSize();
-            updateMargin();
-            updateFontSize();
-            battleField.draw();
-        }
-        else if (btn == lobbyPane.quit) {
-            Platform.exit();
-        }
-    }
-
-    public void generateField() {
+    public void generateFieldDimensions() {
         Random rand = new Random();
         fieldWidth = dimensions[rand.nextInt(dimensions.length)];
         fieldHeight = dimensions[rand.nextInt(dimensions.length)];
         System.out.println("fieldWidth: " + fieldWidth);
         System.out.println("fieldHeight: " + fieldHeight);
         field = new Cell[fieldWidth][fieldHeight];
+    }
 
+    public void fillUpFieldWithCells(){
         for (int x = 0; x < fieldWidth; x++) {
             for (int y = 0; y < fieldHeight; y++) {
                 field[x][y] = new Cell(x, y, cellSize);
