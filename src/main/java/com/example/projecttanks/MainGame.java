@@ -32,12 +32,14 @@ public class MainGame extends Application {
     Stage stage;
 
     Button quit = new Button("Quit");
+    Button generate = new Button("Generate");
+    Button newRound = new Button("New round");
     Label lbPlayer1 = new Label();
     Label lbTime = new Label();
     Label lbPlayer2 = new Label();
 
     HBox topPane = new HBox(lbPlayer1, lbTime, lbPlayer2);
-    HBox bottomPane = new HBox(quit);
+    HBox bottomPane = new HBox(newRound, generate, quit);
 
     VBox leftPane = new VBox();
     VBox rightPane = new VBox();
@@ -107,6 +109,14 @@ public class MainGame extends Application {
         });
 
         quit.setOnAction(e -> btnAction(quit)); // game quit
+        generate.setOnAction(e -> {
+            resetTime();
+            battleField.generateBtn();
+        });
+        newRound.setOnAction(e -> {
+            battleField.getChildren().clear();
+            startNewRound();
+        });
 
         Timeline animation = new Timeline(new KeyFrame(new Duration(20), e -> {
             if (gameState == GameState.LOBBY) {
@@ -148,23 +158,31 @@ public class MainGame extends Application {
 
     public void btnAction(Button btn){
         if (btn == lobbyPane.start) {
-            gameState = GameState.GAME;
             stage.setScene(battleScene);
 
-            battleField.generateFieldDimensions();
-            battleField.setCellSize();
-            battleField.fillUpFieldWithCells();
-            updateMargin();
-
-            updateTimeLabel();
-            updatePlayer1Label();
-            updatePlayer2Label();
-
-            battleField.draw();
+            startNewRound();
         }
         else if (btn == lobbyPane.quit || btn == quit) {
             Platform.exit();
         }
+    }
+
+    public void startNewRound(){
+        gameState = GameState.PAUSE;
+        battleField.generateFieldDimensions();
+        updateMargin();
+
+        resetTime();
+        updateTimeLabel();
+        updatePlayer1Label();
+        updatePlayer2Label();
+
+        gameState = GameState.GAME;
+        battleField.draw();
+    }
+
+    private void resetTime() {
+        time = 0;
     }
 
     private void updateMargin() {

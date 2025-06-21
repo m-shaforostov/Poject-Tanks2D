@@ -12,7 +12,7 @@ public class Cell {
     public Vector2D position; // pixels
     public double size;
 
-    public boolean checked;
+    public boolean isVisited = false;
 
     public boolean wallTop = true;
     public boolean wallBottom = true;
@@ -37,6 +37,22 @@ public class Cell {
         this.y = y;
         this.position = new Vector2D(x * size, y * size);
         this.size = size;
+    }
+
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
+    }
+
+    public void reset(){
+        isVisited = false;
+        wallTop = true;
+        wallBottom = true;
+        wallLeft = true;
+        wallRight = true;
     }
 
     public void setWallTop(boolean wall_top){
@@ -124,5 +140,9 @@ public class Cell {
         updateWallBottom();
         updateWallLeft();
         updateWallRight();
+    }
+
+    public void setVisited() {
+        isVisited = true;
     }
 }
