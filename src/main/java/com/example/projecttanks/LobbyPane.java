@@ -1,7 +1,5 @@
 package com.example.projecttanks;
 
-import javafx.application.Platform;
-import javafx.event.EventTarget;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
@@ -15,7 +13,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-public class UI extends Pane {
+public class LobbyPane extends Pane {
     MainGame game;
 
     public Button start = new Button("Start");
@@ -32,8 +30,7 @@ public class UI extends Pane {
 
     private Rectangle lobbyBG = new Rectangle(0, 0);
 
-
-    UI(MainGame game) {
+    LobbyPane(MainGame game) {
         this.game = game;
     }
 
@@ -45,13 +42,13 @@ public class UI extends Pane {
             drawLobbyText();
         }
         // Game field
-        if (game.gameState == GameState.GAME) {
-            for (int x = 0; x < game.fieldWidth; x++) {
-                for (int y = 0; y < game.fieldHeight; y++) {
-                    getChildren().addAll(game.field[x][y].initElements(game.offset));
-                }
-            }
-        }
+//        if (game.gameState == GameState.GAME) {
+//            for (int x = 0; x < game.fieldWidth; x++) {
+//                for (int y = 0; y < game.fieldHeight; y++) {
+//                    getChildren().addAll(game.field[x][y].initElements(game.offset));
+//                }
+//            }
+//        }
         // Pause message
         // End info
 
@@ -59,10 +56,10 @@ public class UI extends Pane {
     }
 
     private void lobbyBG() {
-        lobbyBG.widthProperty().bind(game.pane.widthProperty());
-        lobbyBG.heightProperty().bind(game.pane.heightProperty());
+        lobbyBG.widthProperty().bind(game.lobbyPane.widthProperty());
+        lobbyBG.heightProperty().bind(game.lobbyPane.heightProperty());
         lobbyBG.setFill(Color.rgb(70, 120, 80));
-        game.pane.getChildren().add(lobbyBG);
+        game.lobbyPane.getChildren().add(lobbyBG);
     }
 
     private void drawLobbyText() {
@@ -70,23 +67,23 @@ public class UI extends Pane {
         text.setFill(Color.BLACK);
         text.setStrokeWidth(2);
         text.setFont(Font.font("System", FontWeight.BOLD, 50));
-        text.setLayoutX(game.pane.getWidth() / 2 - text.getLayoutBounds().getWidth() / 2);
-        text.setLayoutY(game.pane.getHeight() / 2 - text.getLayoutBounds().getHeight());
-        game.pane.getChildren().add(text);
+        text.setLayoutX(game.lobbyPane.getWidth() / 2 - text.getLayoutBounds().getWidth() / 2);
+        text.setLayoutY(game.lobbyPane.getHeight() / 2 - text.getLayoutBounds().getHeight());
+        game.lobbyPane.getChildren().add(text);
     }
 
     private void drawLobbyBtns(){
         double shadowGap = 5;
 
-        double startPosX = game.pane.getWidth() / 2 - lobbyBtnWidth - GAP_BETWEEN_BUTTONS / 2;
+        double startPosX = game.lobbyPane.getWidth() / 2 - lobbyBtnWidth - GAP_BETWEEN_BUTTONS / 2;
         drawBtn(shadowGap, startPosX, start);
 
-        double quitPosX = game.pane.getWidth() / 2 + GAP_BETWEEN_BUTTONS / 2;
+        double quitPosX = game.lobbyPane.getWidth() / 2 + GAP_BETWEEN_BUTTONS / 2;
         drawBtn(shadowGap, quitPosX, quit);
     }
 
     private void drawBtn(double shadowGap, double posX, Button btn) {
-        double quitPosY = game.pane.getHeight() / 2 - lobbyBtnHeight / 2;
+        double quitPosY = game.lobbyPane.getHeight() / 2 - lobbyBtnHeight / 2;
 
         btn.setPrefWidth(lobbyBtnWidth);
         btn.setPrefHeight(lobbyBtnHeight);
@@ -96,7 +93,7 @@ public class UI extends Pane {
         btn.setLayoutX(posX - shadowGap);
         btn.setLayoutY(quitPosY - shadowGap);
         btn.setEffect(shadow);
-        game.pane.getChildren().add(btn);
+        game.lobbyPane.getChildren().add(btn);
     }
 
     public void lobbyBtnPressed(MouseEvent e) {
@@ -112,8 +109,5 @@ public class UI extends Pane {
         btn.setLayoutY(btn.getLayoutY() - 3);
         btn.setEffect(shadow);
         game.btnAction(btn);
-    }
-
-    public void update() {
     }
 }
