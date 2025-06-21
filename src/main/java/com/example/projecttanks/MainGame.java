@@ -23,14 +23,6 @@ public class MainGame extends Application {
     public static int LOBBY_WIDTH = 1000;
     public static int LOBBY_HEIGHT = 600;
 
-
-    Vector2D offset = new Vector2D(); // if the field (0,0) point was moved
-    public Cell[][] field;
-    private static int[] dimensions = new int[]{3, 4, 5, 6, 7, 8, 9, 10};
-    public int fieldWidth;
-    public int fieldHeight;
-    public double cellSize;
-
     public GameState gameState;
     LobbyPane lobbyPane;
     Scene lobbyScene;
@@ -103,13 +95,13 @@ public class MainGame extends Application {
         borderPane.setCenter(battleField);
 
         borderPane.widthProperty().addListener((observableValue, number, t1) -> {
-            setCellSize();
+            battleField.setCellSize();
             battleField.update();
             updateMargin();
         });
 
         borderPane.heightProperty().addListener((observableValue, number, t1) -> {
-            setCellSize();
+            battleField.setCellSize();
             battleField.update();
             updateMargin();
         });
@@ -159,9 +151,9 @@ public class MainGame extends Application {
             gameState = GameState.GAME;
             stage.setScene(battleScene);
 
-            generateFieldDimensions();
-            setCellSize();
-            fillUpFieldWithCells();
+            battleField.generateFieldDimensions();
+            battleField.setCellSize();
+            battleField.fillUpFieldWithCells();
             updateMargin();
 
             updateTimeLabel();
@@ -184,37 +176,5 @@ public class MainGame extends Application {
         rightPane.setPrefWidth(horizontalMargin);
     }
 
-    private void setCellSize(){
-        double centralPaneHeight = borderPane.getHeight() - 100;
-        double centralPaneWidth = borderPane.getWidth();
-        double centralPaneRatio = (double) centralPaneWidth / centralPaneHeight;
 
-        double battleFieldRatio = (double) fieldWidth / fieldHeight;
-        if (battleFieldRatio > centralPaneRatio) {
-            cellSize = centralPaneWidth / fieldWidth;
-            battleField.setPrefWidth(centralPaneWidth);
-            battleField.setPrefHeight(fieldHeight * cellSize);
-        } else {
-            cellSize = centralPaneHeight / fieldHeight;
-            battleField.setPrefWidth(fieldWidth * cellSize);
-            battleField.setPrefHeight(centralPaneHeight);
-        }
-    }
-
-    public void generateFieldDimensions() {
-        Random rand = new Random();
-        fieldWidth = dimensions[rand.nextInt(dimensions.length)];
-        fieldHeight = dimensions[rand.nextInt(dimensions.length)];
-        System.out.println("fieldWidth: " + fieldWidth);
-        System.out.println("fieldHeight: " + fieldHeight);
-        field = new Cell[fieldWidth][fieldHeight];
-    }
-
-    public void fillUpFieldWithCells(){
-        for (int x = 0; x < fieldWidth; x++) {
-            for (int y = 0; y < fieldHeight; y++) {
-                field[x][y] = new Cell(x, y, cellSize);
-            }
-        }
-    }
 }
