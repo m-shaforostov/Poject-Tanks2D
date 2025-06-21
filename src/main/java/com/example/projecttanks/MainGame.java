@@ -50,6 +50,9 @@ public class MainGame extends Application {
     VBox leftPane = new VBox();
     VBox rightPane = new VBox();
 
+    public int time = 0;
+    public int timeLimit = 60;
+
     public List<Tank> tanks = new ArrayList<Tank>();
 
     @Override
@@ -77,19 +80,23 @@ public class MainGame extends Application {
         borderPane.setPrefSize(800, 600);
 
         topPane.setAlignment(Pos.CENTER);
-        topPane.setSpacing(40);
-        topPane.setStyle("-fx-background-color: green;");
+        topPane.setSpacing(50);
+        topPane.setStyle("-fx-background-color: linear-gradient(white, white, white, lightgray);" +
+                "-fx-border-width: 0 0 0.5px 0;" +
+                "-fx-border-color: gray;");
         borderPane.setTop(topPane);
 
         bottomPane.setAlignment(Pos.CENTER);
         bottomPane.setSpacing(40);
-        bottomPane.setStyle("-fx-background-color: green;");
+        bottomPane.setStyle("-fx-background-color: linear-gradient(lightgray, white, white, white);" +
+                "-fx-border-width: 0.5px 0 0 0;" +
+                "-fx-border-color: gray;");
 
         borderPane.setBottom(bottomPane);
 
-        leftPane.setStyle("-fx-background-color: lightgray;");
+//        leftPane.setStyle("-fx-background-color: lightgray;");
         borderPane.setLeft(leftPane);
-        rightPane.setStyle("-fx-background-color: lightgray;");
+//        rightPane.setStyle("-fx-background-color: lightgray;");
         borderPane.setRight(rightPane);
 
         battleField = new BattleField(this);
@@ -109,19 +116,42 @@ public class MainGame extends Application {
 
         quit.setOnAction(e -> btnAction(quit)); // game quit
 
-        Timeline animation = new Timeline(new KeyFrame(new Duration(16), e -> {
+        Timeline animation = new Timeline(new KeyFrame(new Duration(20), e -> {
             if (gameState == GameState.LOBBY) {
                 lobbyPane.update();
             } else if (gameState == GameState.GAME){
                 battleField.update();
+                updateTimeLabel();
+                updatePlayer1Label();
+                updatePlayer2Label();
             }
         }));
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.play();
 
+        Timeline timeline = new Timeline(new KeyFrame(new Duration(1000), e -> {
+            if (gameState == GameState.GAME){
+                time++;
+            }
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
         stage.setTitle("Tanks2D");
         stage.setScene(lobbyScene);
         stage.show();
+    }
+
+    private void updateTimeLabel() {
+        lbTime.setText("Time: " + time + " / " + timeLimit);
+    }
+
+    private void updatePlayer1Label() {
+        lbPlayer1.setText("Player 1: " + "killcount" + " / " + "goal");
+    }
+
+    private void updatePlayer2Label() {
+        lbPlayer2.setText("Player 2: " + "killcount" + " / " + "goal");
     }
 
     public void btnAction(Button btn){
@@ -132,9 +162,12 @@ public class MainGame extends Application {
             generateFieldDimensions();
             setCellSize();
             fillUpFieldWithCells();
-
             updateMargin();
-//            updateFontSize();
+
+            updateTimeLabel();
+            updatePlayer1Label();
+            updatePlayer2Label();
+
             battleField.draw();
         }
         else if (btn == lobbyPane.quit || btn == quit) {
