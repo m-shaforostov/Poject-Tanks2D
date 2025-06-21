@@ -2,10 +2,10 @@ package com.example.projecttanks;
 
 import javafx.scene.layout.Pane;
 
-public class ButtleField extends Pane {
+public class BattleField extends Pane {
     MainGame game;
 
-    ButtleField(MainGame game) {
+    BattleField(MainGame game) {
         this.game = game;
     }
 

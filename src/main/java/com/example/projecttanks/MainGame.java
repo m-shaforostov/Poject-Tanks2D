@@ -29,14 +29,14 @@ public class MainGame extends Application {
     private static int[] dimensions = new int[]{3, 4, 5, 6};
     public int fieldWidth;
     public int fieldHeight;
-    public double DEFAULT_CELL_SIZE = 150;
+    public double cellSize;
 
     public GameState gameState;
     LobbyPane lobbyPane;
     Scene lobbyScene;
     BorderPane borderPane = new BorderPane();
-    ButtleField buttleField;
-    Scene buttleScene;
+    BattleField battleField;
+    Scene battleScene;
     Stage stage;
 
     Button quit = new Button("Quit");
@@ -72,18 +72,19 @@ public class MainGame extends Application {
 
         // ButtleField
         borderPane = new BorderPane();
-        buttleScene = new Scene(borderPane);
+        battleScene = new Scene(borderPane);
 
         borderPane.setPrefSize(800, 600);
 
         topPane.setAlignment(Pos.CENTER);
         topPane.setSpacing(40);
-        topPane.setStyle("-fx-background-color: yellow;");
+        topPane.setStyle("-fx-background-color: green;");
         borderPane.setTop(topPane);
 
         bottomPane.setAlignment(Pos.CENTER);
         bottomPane.setSpacing(40);
         bottomPane.setStyle("-fx-background-color: yellow;");
+
         borderPane.setBottom(bottomPane);
 
         leftPane.setStyle("-fx-background-color: yellow;");
@@ -91,9 +92,8 @@ public class MainGame extends Application {
         rightPane.setStyle("-fx-background-color: yellow;");
         borderPane.setRight(rightPane);
 
-        buttleField = new ButtleField(this);
-        borderPane.setCenter(buttleField);
-        updateFontSize();
+        battleField = new BattleField(this);
+        borderPane.setCenter(battleField);
 
         borderPane.widthProperty().addListener((observableValue, number, t1) -> {
             updateMargin();
@@ -121,7 +121,7 @@ public class MainGame extends Application {
     }
 
     private void updateFontSize() {
-        double fontSize = buttleField.getHeight() / 25.0;
+        double fontSize = battleField.getHeight() / 25.0;
         Font font = Font.font(fontSize);
 
         lbPlayer1.setFont(font);
@@ -132,24 +132,42 @@ public class MainGame extends Application {
     }
 
     private void updateMargin() {
-        double size = Math.min(buttleField.getWidth(), buttleField.getHeight());
-        double horizontalMargin = (borderPane.getWidth() - size) / 2.0;
-        double verticalMargin = (borderPane.getHeight() - size) / 2.0;
+        double horizontalMargin = (borderPane.getWidth() - battleField.getPrefWidth()) / 2.0;
+        double verticalMargin = (borderPane.getHeight() - battleField.getPrefHeight()) / 2.0;
         topPane.setPrefHeight(verticalMargin);
         bottomPane.setPrefHeight(verticalMargin);
         leftPane.setPrefWidth(horizontalMargin);
         rightPane.setPrefWidth(horizontalMargin);
+
+        offset = new Vector2D(horizontalMargin, verticalMargin);
+    }
+
+    private void setCellSize(){
+        double centralPaneHeight = borderPane.getPrefHeight() - 100;
+        double centralPaneWidth = borderPane.getPrefWidth();
+        double centralPaneRatio = (double) centralPaneWidth / centralPaneHeight;
+
+        double battleFieldRatio = (double) fieldWidth / fieldHeight;
+        if (battleFieldRatio > centralPaneRatio) {
+            cellSize = centralPaneWidth / fieldWidth;
+            battleField.setPrefWidth(centralPaneWidth);
+            battleField.setPrefHeight(fieldHeight * cellSize);
+        } else {
+            cellSize = centralPaneHeight / fieldHeight;
+            battleField.setPrefWidth(fieldWidth * cellSize);
+            battleField.setPrefHeight(centralPaneHeight);
+        }
     }
 
     public void btnAction(Button btn){
         if (btn == lobbyPane.start) {
             gameState = GameState.GAME;
             generateField();
-
-            stage.setScene(buttleScene);
-            buttleField.setPrefWidth(fieldWidth * DEFAULT_CELL_SIZE);
-            buttleField.setPrefHeight(fieldHeight * DEFAULT_CELL_SIZE);
-            buttleField.draw();
+            stage.setScene(battleScene);
+            setCellSize();
+            updateMargin();
+            updateFontSize();
+            battleField.draw();
         }
         else if (btn == lobbyPane.quit) {
             Platform.exit();
@@ -166,7 +184,7 @@ public class MainGame extends Application {
 
         for (int x = 0; x < fieldWidth; x++) {
             for (int y = 0; y < fieldHeight; y++) {
-                field[x][y] = new Cell(x, y, DEFAULT_CELL_SIZE);
+                field[x][y] = new Cell(x, y, cellSize);
             }
         }
     }
