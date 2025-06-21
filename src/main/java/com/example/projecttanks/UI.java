@@ -44,8 +44,14 @@ public class UI extends Pane {
             drawLobbyBtns();
             drawLobbyText();
         }
-
         // Game field
+        if (game.gameState == GameState.GAME) {
+            for (int x = 0; x < game.fieldWidth; x++) {
+                for (int y = 0; y < game.fieldHeight; y++) {
+                    getChildren().addAll(game.field[x][y].initElements(game.offset));
+                }
+            }
+        }
         // Pause message
         // End info
 
@@ -105,16 +111,7 @@ public class UI extends Pane {
         btn.setLayoutX(btn.getLayoutX() - 3);
         btn.setLayoutY(btn.getLayoutY() - 3);
         btn.setEffect(shadow);
-        btnAction(btn);
-    }
-
-    public void btnAction(Button btn){
-        if (btn == start) {
-            game.gameState = GameState.GAME;
-        }
-        else if (btn == quit) {
-            Platform.exit();
-        }
+        game.btnAction(btn);
     }
 
     public void update() {
