@@ -47,8 +47,6 @@ public class MainGame extends Application {
     public int time = 0;
     public int timeLimit = 60;
 
-    public List<Tank> tanks = new ArrayList<Tank>();
-
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
@@ -99,6 +97,7 @@ public class MainGame extends Application {
         borderPane.widthProperty().addListener((observableValue, number, t1) -> {
             battleField.setCellSize();
             battleField.update();
+            battleField.updatePlayers();
             updateMargin();
         });
 
@@ -122,6 +121,8 @@ public class MainGame extends Application {
             if (gameState == GameState.LOBBY) {
                 lobbyPane.update();
             } else if (gameState == GameState.GAME){
+                battleField.firstPlayer.move(0.02);
+                battleField.secondPlayer.move(0.02);
                 battleField.update();
                 updateTimeLabel();
                 updatePlayer1Label();
@@ -139,27 +140,35 @@ public class MainGame extends Application {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
+        setKeyEvents();
+
         stage.setTitle("Tanks2D");
         stage.setScene(lobbyScene);
         stage.show();
     }
 
     private void updateTimeLabel() {
-        lbTime.setText("Time: " + time + " / " + timeLimit);
+//        lbTime.setText("Time: " + time + " / " + timeLimit);
+        lbTime.setText("");
+
     }
 
     private void updatePlayer1Label() {
-        lbPlayer1.setText("Player 1: " + "killcount" + " / " + "goal");
+        if (battleField.firstPlayer.position != null)
+            lbPlayer1.setText("position1: " + battleField.firstPlayer.position.x + " , " +
+                battleField.firstPlayer.position.x + " angle: " + battleField.firstPlayer.angle);
     }
 
     private void updatePlayer2Label() {
-        lbPlayer2.setText("Player 2: " + "killcount" + " / " + "goal");
+//        lbPlayer2.setText("Player 2: " + "killcount" + " / " + "goal");
+        if (battleField.firstPlayer.velocity != null)
+            lbPlayer2.setText("velocity: " + battleField.firstPlayer.velocity.x + " , " +
+                battleField.firstPlayer.velocity.x + " speed: " + battleField.firstPlayer.speed);
     }
 
     public void btnAction(Button btn){
         if (btn == lobbyPane.start) {
             stage.setScene(battleScene);
-
             startNewRound();
         }
         else if (btn == lobbyPane.quit || btn == quit) {
@@ -169,16 +178,20 @@ public class MainGame extends Application {
 
     public void startNewRound(){
         gameState = GameState.PAUSE;
-        battleField.generateFieldDimensions();
-        updateMargin();
+        battleField.initField();
 
+        updateLabels();
+        updateMargin();
+        battleField.draw();
+        battleField.initPlayers();
+        gameState = GameState.GAME;
+    }
+
+    private void updateLabels(){
         resetTime();
         updateTimeLabel();
         updatePlayer1Label();
         updatePlayer2Label();
-
-        gameState = GameState.GAME;
-        battleField.draw();
     }
 
     private void resetTime() {
@@ -194,5 +207,76 @@ public class MainGame extends Application {
         rightPane.setPrefWidth(horizontalMargin);
     }
 
+    private void setKeyEvents() {
+        battleScene.setOnKeyPressed(event -> {
+            if (gameState == GameState.GAME) {
+                switch (event.getCode()) {
+                    case LEFT:
+                        battleField.secondPlayer.rotateLeft();
+                        break;
+                    case UP:
+                        battleField.secondPlayer.moveForward();
+                        break;
+                    case DOWN:
+                        battleField.secondPlayer.moveBack();
+                        break;
+                    case RIGHT:
+                        battleField.secondPlayer.rotateRight();
+                        break;
+                    case ENTER:
+                        battleField.secondPlayer.shoot();
+                        break;
 
+                    case A:
+                        battleField.firstPlayer.rotateLeft();
+                        break;
+                    case W:
+                        battleField.firstPlayer.moveForward();
+                        break;
+                    case S:
+                        battleField.firstPlayer.moveBack();
+                        break;
+                    case D:
+                        battleField.firstPlayer.rotateRight();
+                        break;
+                    case Q:
+                        battleField.firstPlayer.shoot();
+                        break;
+                }
+            }
+        });
+        battleScene.setOnKeyReleased(event -> {
+            if (gameState == GameState.GAME) {
+                switch (event.getCode()) {
+//                    case LEFT:
+//                        battleField.secondPlayer.rotateLeft();
+//                        break;
+//                    case UP:
+//                        battleField.secondPlayer.moveForward();
+//                        break;
+//                    case DOWN:
+//                        battleField.secondPlayer.moveBack();
+//                        break;
+//                    case RIGHT:
+//                        battleField.secondPlayer.rotateRight();
+//                        break;
+//                    case ENTER:
+//                        battleField.secondPlayer.shoot();
+//                        break;
+
+                    case A:
+                    case D:
+                        battleField.firstPlayer.stopRotation();
+                        break;
+                    case W:
+                    case S:
+                        battleField.firstPlayer.stopMovement();
+                        break;
+//                    case Q:
+//                        battleField.firstPlayer.shoot();
+//                        break;
+                }
+            }
+        });
+    }
 }

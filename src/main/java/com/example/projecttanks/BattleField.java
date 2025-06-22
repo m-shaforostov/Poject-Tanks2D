@@ -16,22 +16,59 @@ public class BattleField extends Pane {
     public int fieldHeight;
     public double cellSize;
 
+    public List<Tank> tanks = new ArrayList<Tank>();
+    public Tank firstPlayer;
+    public Tank secondPlayer;
+
     BattleField(MainGame game) {
         this.game = game;
+        firstPlayer = new Tank(Player.ONE);
+        tanks.add(firstPlayer);
+        secondPlayer = new Tank(Player.TWO);
+        tanks.add(secondPlayer);
+    }
+
+    public void initPlayers() {
+        generatePlayersPosition();
+        firstPlayer.setWidth(cellSize * 0.3);
+        firstPlayer.setLength(cellSize * 0.5);
+
+        secondPlayer.setWidth(cellSize * 0.3);
+        secondPlayer.setLength(cellSize * 0.5);
+
+        firstPlayer.init();
+        secondPlayer.init();
+
+        getChildren().addAll(firstPlayer.base, firstPlayer.muzzle, firstPlayer.turret);
+        getChildren().addAll(secondPlayer.base, secondPlayer.muzzle, secondPlayer.turret);
+    }
+
+
+    private void generatePlayersPosition() {
+        int spawnAreaWidth = fieldWidth / 2;
+        int spawnAreaHeight = fieldHeight / 2;
+
+        Random rand = new Random();
+        double firstPlayerX = rand.nextInt(spawnAreaWidth);
+        double firstPlayerY = rand.nextInt(spawnAreaHeight);
+
+        double secondPlayerX = fieldWidth - rand.nextInt(spawnAreaWidth);
+        double secondPlayerY = fieldHeight - rand.nextInt(spawnAreaHeight);
+
+        firstPlayer.setPosition(new Vector2D((firstPlayerX + 0.5) * cellSize, (firstPlayerY + 0.5) * cellSize));
+        secondPlayer.setPosition(new Vector2D((secondPlayerX - 0.5) * cellSize, (secondPlayerY - 0.5) * cellSize));
     }
 
     public void draw(){
-        if (game.gameState == GameState.GAME) {
-            List<Rectangle> walls = new ArrayList<>();
-            for (int x = 0; x < fieldWidth; x++) {
-                for (int y = 0; y < fieldHeight; y++) {
-                    List<Rectangle> elements = field[x][y].initElements();
-                    getChildren().addAll(elements.removeFirst()); // draw the cell
-                    walls.addAll(elements); // save cell's walls
-                }
+        List<Rectangle> walls = new ArrayList<>();
+        for (int x = 0; x < fieldWidth; x++) {
+            for (int y = 0; y < fieldHeight; y++) {
+                List<Rectangle> elements = field[x][y].initElements();
+                getChildren().addAll(elements.removeFirst()); // draw the cell
+                walls.addAll(elements); // save cell's walls
             }
-            getChildren().addAll(walls); // draw the walls
         }
+        getChildren().addAll(walls); // draw the walls
     }
 
     public void update() {
@@ -59,6 +96,13 @@ public class BattleField extends Pane {
         }
     }
 
+    public void initField() {
+        generateFieldDimensions();
+        fillUpFieldWithCells();
+        setCellSize();
+        generateMaze();
+    }
+
     public void generateFieldDimensions() {
         Random rand = new Random();
         fieldWidth = dimensions[rand.nextInt(dimensions.length)];
@@ -66,9 +110,6 @@ public class BattleField extends Pane {
         System.out.println("fieldWidth: " + fieldWidth);
         System.out.println("fieldHeight: " + fieldHeight);
         field = new Cell[fieldWidth][fieldHeight];
-        fillUpFieldWithCells();
-        setCellSize();
-        generateMaze();
     }
 
     private void fillUpFieldWithCells(){
@@ -159,5 +200,9 @@ public class BattleField extends Pane {
 
         draw();
 //        drawTanks();
+    }
+
+    public void updatePlayers() {
+        ;
     }
 }
