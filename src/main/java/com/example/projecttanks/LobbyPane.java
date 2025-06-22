@@ -20,6 +20,8 @@ public class LobbyPane extends Pane {
     public Button quit = new Button("Quit");
     private Rectangle lobbyBG = new Rectangle(0, 0);
     Text text = new Text("Tanks Battle!");
+    double shadowOffsetStartBtn = 5;
+    double shadowOffsetQuitBtn = 5;
 
     private final Background lobbyBtnBackground = new Background(new BackgroundFill(Color.DARKGREEN, new CornerRadii(5), null));
     private final Font lobbyBtnFont = Font.font("System", FontWeight.BOLD, 16);
@@ -37,6 +39,8 @@ public class LobbyPane extends Pane {
 
     public void draw() {
         if (game.gameState == GameState.LOBBY) {
+            buttonInit(start);
+            buttonInit(quit);
             update();
 
             game.lobbyPane.getChildren().add(lobbyBG);
@@ -44,12 +48,6 @@ public class LobbyPane extends Pane {
             game.lobbyPane.getChildren().add(quit);
             game.lobbyPane.getChildren().add(text);
         }
-    }
-
-    public void update() {
-        colorBG();
-        updateLobbyText();
-        updateAllBtns();
     }
 
     private void colorBG() {
@@ -66,42 +64,54 @@ public class LobbyPane extends Pane {
         text.setLayoutY(game.lobbyPane.getHeight() / 2 - text.getLayoutBounds().getHeight());
     }
 
-    private void updateAllBtns(){
-        double posY = game.lobbyPane.getHeight() / 2 - lobbyBtnHeight / 2;
-
-        double startPosX = game.lobbyPane.getWidth() / 2 - lobbyBtnWidth - GAP_BETWEEN_BUTTONS / 2;
-        udateBtn(startPosX, posY, start);
-
-        double quitPosX = game.lobbyPane.getWidth() / 2 + GAP_BETWEEN_BUTTONS / 2;
-        udateBtn(quitPosX, posY, quit);
-    }
-
-    private void udateBtn(double posX, double posY, Button btn) {
-        double shadowGap = 5;
-
+    private void buttonInit(Button btn) {
         btn.setPrefWidth(lobbyBtnWidth);
         btn.setPrefHeight(lobbyBtnHeight);
         btn.setBackground(lobbyBtnBackground);
         btn.setFont(lobbyBtnFont);
         btn.setTextFill(lobbyBtnColor);
-        btn.setLayoutX(posX - shadowGap);
-        btn.setLayoutY(posY - shadowGap);
         btn.setEffect(shadow);
+    }
+
+    private void updateAllBtns(){
+        double posY = game.lobbyPane.getHeight() / 2 - lobbyBtnHeight / 2;
+
+        double startPosX = game.lobbyPane.getWidth() / 2 - lobbyBtnWidth - GAP_BETWEEN_BUTTONS / 2;
+        updateBtn(startPosX, posY, start, shadowOffsetStartBtn);
+
+        double quitPosX = game.lobbyPane.getWidth() / 2 + GAP_BETWEEN_BUTTONS / 2;
+        updateBtn(quitPosX, posY, quit, shadowOffsetQuitBtn);
+    }
+
+    private void updateBtn(double posX, double posY, Button btn, double offset) {
+        btn.setLayoutX(posX - offset);
+        btn.setLayoutY(posY - offset);
     }
 
     public void lobbyBtnPressed(MouseEvent e) {
         Button btn = (Button) e.getSource();
-        btn.setLayoutX(btn.getLayoutX() + 3);
-        btn.setLayoutY(btn.getLayoutY() + 3);
+        if (btn == start) {
+            shadowOffsetStartBtn = 0;
+        } else if (btn == quit) {
+            shadowOffsetQuitBtn = 0;
+        }
         btn.setEffect(null);
     }
 
     public void lobbyBtnReleased(MouseEvent e) {
         Button btn = (Button) e.getSource();
-        btn.setLayoutX(btn.getLayoutX() - 3);
-        btn.setLayoutY(btn.getLayoutY() - 3);
+        if (btn == start) {
+            shadowOffsetStartBtn = 5;
+        } else if (btn == quit) {
+            shadowOffsetQuitBtn = 5;
+        }
         btn.setEffect(shadow);
         game.btnAction(btn);
     }
 
+    public void update() {
+        colorBG();
+        updateLobbyText();
+        updateAllBtns();
+    }
 }

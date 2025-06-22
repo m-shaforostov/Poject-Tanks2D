@@ -23,7 +23,8 @@ public class Tank {
     private static double speedLimit; // px per second
 
     private boolean isMoving = false;
-    private boolean isRotating = false;
+    private boolean isRotatingL = false;
+    private boolean isRotatingR = false;
 
     public Player player;
     private Color color;
@@ -65,7 +66,7 @@ public class Tank {
     }
 
     public void move(double dt) {
-        if (!isRotating) rotationSpeed = 0;
+        if (!isRotatingL && !isRotatingR) rotationSpeed = 0;
         angle = (angle + 360 + rotationSpeed * dt) % 360;
 
         updateRotation();
@@ -82,7 +83,8 @@ public class Tank {
         rotationSpeed = 0;
         angle = 0;
         isMoving = false;
-        isRotating = false;
+        isRotatingL = false;
+        isRotatingR = false;
 
         rotation = new Rotate(0, position.x, position.y);
 
@@ -122,40 +124,37 @@ public class Tank {
         turret.setStrokeWidth(1);
     }
 
-    public void rotateLeft() {
-        rotationSpeed = ROTATION_SPEED;
-        startRotation();
-    }
-
-    public void rotateRight() {
-        rotationSpeed = -ROTATION_SPEED;
-        startRotation();
-    }
-
-    public void moveForward() {
+    public void startMovementForward(){
         speed = speedLimit;
-        startMovement();
+        isMoving = true;
     }
 
-    public void moveBack() {
+    public void startMovementBackwards() {
         speed = -speedLimit;
-        startMovement();
-    }
-
-    public void startMovement(){
         isMoving = true;
     }
 
     public void stopMovement(){
+        speed = 0;
         isMoving = false;
     }
 
-    public void startRotation(){
-        isRotating = true;
+    public void startRotationL(){
+        rotationSpeed = isRotatingR ? 0 : ROTATION_SPEED;
+        isRotatingL = true;
+    }
+    public void startRotationR(){
+        rotationSpeed = isRotatingL ? 0 : -ROTATION_SPEED;
+        isRotatingR = true;
     }
 
-    public void stopRotation(){
-        isRotating = false;
+    public void stopRotationL(){
+        rotationSpeed = isRotatingR ? -ROTATION_SPEED : 0;
+        isRotatingL = false;
+    }
+    public void stopRotationR(){
+        rotationSpeed = isRotatingR ? ROTATION_SPEED : 0;
+        isRotatingR = false;
     }
 
     public void shoot() {

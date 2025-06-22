@@ -30,12 +30,13 @@ public class MainGame extends Application {
     Button quit = new Button("Quit");
     Button generate = new Button("Generate");
     Button newRound = new Button("New round");
+    Button home = new Button("Home");
     Label lbPlayer1 = new Label();
     Label lbTime = new Label();
     Label lbPlayer2 = new Label();
 
     HBox topPane = new HBox(lbPlayer1, lbTime, lbPlayer2);
-    HBox bottomPane = new HBox(newRound, generate, quit);
+    HBox bottomPane = new HBox(home, newRound, generate, quit);
 
     VBox leftPane = new VBox();
     VBox rightPane = new VBox();
@@ -103,29 +104,12 @@ public class MainGame extends Application {
             updateMargin();
         });
 
-        quit.setOnAction(e -> btnAction(quit)); // game quit
-        generate.setOnAction(e -> {
-            resetTime();
-            battleField.generateBtn();
-        });
-        newRound.setOnAction(e -> {
-            battleField.getChildren().clear();
-            startNewRound();
-        });
+        quit.setOnAction(e -> btnAction(quit));
+        generate.setOnAction(e -> btnAction(generate));
+        newRound.setOnAction(e -> btnAction(newRound));
+        home.setOnAction(e -> btnAction(home));
 
-        Timeline animation = new Timeline(new KeyFrame(new Duration(20), e -> {
-            if (gameState == GameState.LOBBY) {
-                lobbyPane.update();
-            } else if (gameState == GameState.GAME){
-                battleField.firstPlayer.move(0.02);
-                battleField.secondPlayer.move(0.02);
-                battleField.update();
-                updateTimeLabel();
-                updatePlayer1Label();
-                updatePlayer2Label();
-            }
-        }));
-        animation.setCycleCount(Timeline.INDEFINITE);
+        Timeline animation = getAnimation();
         animation.play();
 
         Timeline timeline = new Timeline(new KeyFrame(new Duration(1000), e -> {
@@ -141,6 +125,24 @@ public class MainGame extends Application {
         stage.setTitle("Tanks2D");
         stage.setScene(lobbyScene);
         stage.show();
+    }
+
+    private Timeline getAnimation() {
+        Timeline animation = new Timeline(new KeyFrame(new Duration(20), e -> {
+            if (gameState == GameState.LOBBY) {
+                lobbyPane.update();
+            } else if (gameState == GameState.GAME){
+                battleField.firstPlayer.move(0.02);
+                battleField.secondPlayer.move(0.02);
+                battleField.update();
+                unfocus();
+                updateTimeLabel();
+                updatePlayer1Label();
+                updatePlayer2Label();
+            }
+        }));
+        animation.setCycleCount(Timeline.INDEFINITE);
+        return animation;
     }
 
     private void updateTimeLabel() {
@@ -166,10 +168,30 @@ public class MainGame extends Application {
         if (btn == lobbyPane.start) {
             stage.setScene(battleScene);
             startNewRound();
+            unfocus();
+        }
+        else if (btn == generate) {
+            resetTime();
+            battleField.generateBtn();
+            unfocus();
+        }
+        else if (btn == newRound) {
+            battleField.getChildren().clear();
+            startNewRound();
+            unfocus();
+        }
+        else if (btn == home) {
+            gameState = GameState.LOBBY;
+            battleField.getChildren().clear();
+            stage.setScene(lobbyScene);
         }
         else if (btn == lobbyPane.quit || btn == quit) {
             Platform.exit();
         }
+    }
+
+    public void unfocus(){
+        battleField.requestFocus();
     }
 
     public void startNewRound(){
@@ -204,36 +226,36 @@ public class MainGame extends Application {
     }
 
     private void setKeyEvents() {
-        borderPane.setOnKeyPressed(event -> {
+        battleScene.setOnKeyPressed(event -> {
             if (gameState == GameState.GAME) {
                 switch (event.getCode()) {
                     case LEFT:
-                        battleField.secondPlayer.rotateLeft();
+                        battleField.secondPlayer.startRotationL();
                         break;
                     case UP:
-                        battleField.secondPlayer.moveForward();
+                        battleField.secondPlayer.startMovementForward();
                         break;
                     case DOWN:
-                        battleField.secondPlayer.moveBack();
+                        battleField.secondPlayer.startMovementBackwards();
                         break;
                     case RIGHT:
-                        battleField.secondPlayer.rotateRight();
+                        battleField.secondPlayer.startRotationR();
                         break;
                     case ENTER:
                         battleField.secondPlayer.shoot();
                         break;
 
                     case A:
-                        battleField.firstPlayer.rotateLeft();
+                        battleField.firstPlayer.startRotationL();
                         break;
                     case W:
-                        battleField.firstPlayer.moveForward();
+                        battleField.firstPlayer.startMovementForward();
                         break;
                     case S:
-                        battleField.firstPlayer.moveBack();
+                        battleField.firstPlayer.startMovementBackwards();
                         break;
                     case D:
-                        battleField.firstPlayer.rotateRight();
+                        battleField.firstPlayer.startRotationR();
                         break;
                     case Q:
                         battleField.firstPlayer.shoot();
@@ -241,12 +263,14 @@ public class MainGame extends Application {
                 }
             }
         });
-        borderPane.setOnKeyReleased(event -> {
+        battleScene.setOnKeyReleased(event -> {
             if (gameState == GameState.GAME) {
                 switch (event.getCode()) {
                     case LEFT:
+                        battleField.secondPlayer.stopRotationL();
+                        break;
                     case RIGHT:
-                        battleField.secondPlayer.stopRotation();
+                        battleField.secondPlayer.stopRotationR();
                         break;
                     case UP:
                     case DOWN:
@@ -254,8 +278,10 @@ public class MainGame extends Application {
                         break;
 
                     case A:
+                        battleField.firstPlayer.stopRotationL();
+                        break;
                     case D:
-                        battleField.firstPlayer.stopRotation();
+                        battleField.firstPlayer.stopRotationR();
                         break;
                     case W:
                     case S:
