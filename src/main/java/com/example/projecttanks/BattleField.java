@@ -22,12 +22,15 @@ public class BattleField extends Pane {
 
     public void draw(){
         if (game.gameState == GameState.GAME) {
+            List<Rectangle> walls = new ArrayList<>();
             for (int x = 0; x < fieldWidth; x++) {
                 for (int y = 0; y < fieldHeight; y++) {
-                    List<Rectangle> a = field[x][y].initElements();
-                    getChildren().addAll(a);
+                    List<Rectangle> elements = field[x][y].initElements();
+                    getChildren().addAll(elements.removeFirst()); // draw the cell
+                    walls.addAll(elements); // save cell's walls
                 }
             }
+            getChildren().addAll(walls); // draw the walls
         }
     }
 

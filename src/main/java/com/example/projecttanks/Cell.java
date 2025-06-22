@@ -29,8 +29,8 @@ public class Cell {
 
     private Color BG_COLOR = Color.WHITE;
     private Color WALL_COLOR = Color.BLACK;
-    private double wallNarrowSide = 0.05;
-    private double wallWideSide = 1;
+    private double wallNarrowSide = 0.1;
+    private double wallWideSide = 1.05;
 
     Cell(int x, int y, double size) {
         this.x = x;
@@ -87,16 +87,19 @@ public class Cell {
     }
 
     private void updateWallTop() {
-        wallTopR.setLayoutX(position.x);
-        wallTopR.setLayoutY(position.y);
+        double x = position.x - wallNarrowSide * size / 2.0;
+        double y = position.y - wallNarrowSide * size / 2.0;
+        wallTopR.setLayoutX(x);
+        wallTopR.setLayoutY(y);
         wallTopR.setWidth(wallWideSide * size);
         wallTopR.setHeight(wallNarrowSide * size);
         wallTopR.setFill(WALL_COLOR);
     }
 
     private void updateWallBottom() {
-        double y = position.y + size - wallNarrowSide * size;
-        wallBottomR.setLayoutX(position.x);
+        double x = position.x;
+        double y = position.y + size - wallNarrowSide * size / 2.0;
+        wallBottomR.setLayoutX(x);
         wallBottomR.setLayoutY(y);
         wallBottomR.setWidth(wallWideSide * size);
         wallBottomR.setHeight(wallNarrowSide * size);
@@ -104,17 +107,20 @@ public class Cell {
     }
 
     private void updateWallLeft() {
-        wallLeftR.setLayoutX(position.x);
-        wallLeftR.setLayoutY(position.y);
+        double x = position.x - wallNarrowSide * size / 2.0;
+        double y = position.y;
+        wallLeftR.setLayoutX(x);
+        wallLeftR.setLayoutY(y);
         wallLeftR.setWidth(wallNarrowSide * size);
         wallLeftR.setHeight(wallWideSide * size);
         wallLeftR.setFill(WALL_COLOR);
     }
 
     private void updateWallRight() {
-        double x = position.x + size - wallNarrowSide * size;
+        double x = position.x + size - wallNarrowSide * size / 2.0;
+        double y = position.y - wallNarrowSide * size / 2.0;
         wallRightR.setLayoutX(x);
-        wallRightR.setLayoutY(position.y);
+        wallRightR.setLayoutY(y);
         wallRightR.setWidth(wallNarrowSide * size);
         wallRightR.setHeight(wallWideSide * size);
         wallRightR.setFill(WALL_COLOR);
