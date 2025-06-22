@@ -11,13 +11,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class MainGame extends Application {
     public static int LOBBY_WIDTH = 1000;
@@ -208,7 +204,7 @@ public class MainGame extends Application {
     }
 
     private void setKeyEvents() {
-        battleScene.setOnKeyPressed(event -> {
+        borderPane.setOnKeyPressed(event -> {
             if (gameState == GameState.GAME) {
                 switch (event.getCode()) {
                     case LEFT:
@@ -245,24 +241,17 @@ public class MainGame extends Application {
                 }
             }
         });
-        battleScene.setOnKeyReleased(event -> {
+        borderPane.setOnKeyReleased(event -> {
             if (gameState == GameState.GAME) {
                 switch (event.getCode()) {
-//                    case LEFT:
-//                        battleField.secondPlayer.rotateLeft();
-//                        break;
-//                    case UP:
-//                        battleField.secondPlayer.moveForward();
-//                        break;
-//                    case DOWN:
-//                        battleField.secondPlayer.moveBack();
-//                        break;
-//                    case RIGHT:
-//                        battleField.secondPlayer.rotateRight();
-//                        break;
-//                    case ENTER:
-//                        battleField.secondPlayer.shoot();
-//                        break;
+                    case LEFT:
+                    case RIGHT:
+                        battleField.secondPlayer.stopRotation();
+                        break;
+                    case UP:
+                    case DOWN:
+                        battleField.secondPlayer.stopMovement();
+                        break;
 
                     case A:
                     case D:
@@ -272,9 +261,6 @@ public class MainGame extends Application {
                     case S:
                         battleField.firstPlayer.stopMovement();
                         break;
-//                    case Q:
-//                        battleField.firstPlayer.shoot();
-//                        break;
                 }
             }
         });

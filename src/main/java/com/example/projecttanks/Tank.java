@@ -19,8 +19,8 @@ public class Tank {
     private double rotationSpeed = 0;
     Rotate rotation;
 
-    private static double ROTATION_SPEED = 360;
-    private static double SPEED_LIMIT = 100;
+    private static double ROTATION_SPEED = 300; // angle per second
+    private static double speedLimit; // px per second
 
     private boolean isMoving = false;
     private boolean isRotating = false;
@@ -38,8 +38,11 @@ public class Tank {
     Circle turret = new Circle();
     Rectangle muzzle = new Rectangle();
 
-    Tank(Player player) {
+    BattleField battleField;
+
+    Tank(Player player, BattleField battleField) {
         this.player = player;
+        this.battleField = battleField;
         color = player == Player.ONE ? Color.RED : Color.GREEN;
     }
 
@@ -55,13 +58,17 @@ public class Tank {
         this.position = position;
     }
 
+    private void updateRotation(){
+        rotation.setAngle(-angle);
+        rotation.setPivotX(position.x);
+        rotation.setPivotY(position.y);
+    }
+
     public void move(double dt) {
         if (!isRotating) rotationSpeed = 0;
         angle = (angle + 360 + rotationSpeed * dt) % 360;
 
-        rotation.setAngle(-angle);
-        rotation.setPivotX(position.x);
-        rotation.setPivotY(position.y);
+        updateRotation();
 
         if (!isMoving) speed = 0;
         velocity.setAngleAndLength(-Math.PI * angle / 180.0, speed);
@@ -70,10 +77,23 @@ public class Tank {
     }
 
     public void init(){
+        speedLimit = battleField.cellSize * 1.7; // cells per second
+        speed = 0;
+        rotationSpeed = 0;
+        angle = 0;
+        isMoving = false;
+        isRotating = false;
+
         rotation = new Rotate(0, position.x, position.y);
+
+        base.getTransforms().clear();
+        muzzle.getTransforms().clear();
+        turret.getTransforms().clear();
+
         base.getTransforms().add(rotation);
         muzzle.getTransforms().add(rotation);
         turret.getTransforms().add(rotation);
+
         update();
     }
 
@@ -113,12 +133,12 @@ public class Tank {
     }
 
     public void moveForward() {
-        speed = SPEED_LIMIT;
+        speed = speedLimit;
         startMovement();
     }
 
     public void moveBack() {
-        speed = -SPEED_LIMIT;
+        speed = -speedLimit;
         startMovement();
     }
 

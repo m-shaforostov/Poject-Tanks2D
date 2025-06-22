@@ -22,9 +22,9 @@ public class BattleField extends Pane {
 
     BattleField(MainGame game) {
         this.game = game;
-        firstPlayer = new Tank(Player.ONE);
+        firstPlayer = new Tank(Player.ONE, this);
         tanks.add(firstPlayer);
-        secondPlayer = new Tank(Player.TWO);
+        secondPlayer = new Tank(Player.TWO, this);
         tanks.add(secondPlayer);
     }
 
@@ -199,7 +199,7 @@ public class BattleField extends Pane {
         getChildren().clear();
 
         draw();
-//        drawTanks();
+        initPlayers();
     }
 
     public void updatePlayers() {
