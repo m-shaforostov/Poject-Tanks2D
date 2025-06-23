@@ -22,22 +22,18 @@ public class BattleField extends Pane {
 
     BattleField(MainGame game) {
         this.game = game;
-        firstPlayer = new Tank(Player.ONE, this);
-        tanks.add(firstPlayer);
-        secondPlayer = new Tank(Player.TWO, this);
-        tanks.add(secondPlayer);
     }
 
     public void initPlayers() {
+        firstPlayer = new Tank(Player.ONE, this);
+        secondPlayer = new Tank(Player.TWO, this);
+        tanks.add(firstPlayer);
+        tanks.add(secondPlayer);
+
         generatePlayersPosition();
-        firstPlayer.setWidth(cellSize * 0.3);
-        firstPlayer.setLength(cellSize * 0.5);
 
-        secondPlayer.setWidth(cellSize * 0.3);
-        secondPlayer.setLength(cellSize * 0.5);
-
-        firstPlayer.init();
-        secondPlayer.init();
+        firstPlayer.update();
+        secondPlayer.update();
 
         getChildren().addAll(firstPlayer.base, firstPlayer.muzzle, firstPlayer.turret);
         getChildren().addAll(secondPlayer.base, secondPlayer.muzzle, secondPlayer.turret);
@@ -55,8 +51,8 @@ public class BattleField extends Pane {
         double secondPlayerX = fieldWidth - rand.nextInt(spawnAreaWidth);
         double secondPlayerY = fieldHeight - rand.nextInt(spawnAreaHeight);
 
-        firstPlayer.setPosition(new Vector2D((firstPlayerX + 0.5) * cellSize, (firstPlayerY + 0.5) * cellSize));
-        secondPlayer.setPosition(new Vector2D((secondPlayerX - 0.5) * cellSize, (secondPlayerY - 0.5) * cellSize));
+        firstPlayer.setPosition((firstPlayerX + 0.5) * cellSize, (firstPlayerY + 0.5) * cellSize);
+        secondPlayer.setPosition((secondPlayerX - 0.5) * cellSize, (secondPlayerY - 0.5) * cellSize);
     }
 
     public void draw(){
@@ -87,11 +83,19 @@ public class BattleField extends Pane {
         double battleFieldRatio = (double) fieldWidth / fieldHeight;
         if (battleFieldRatio > centralPaneRatio) {
             cellSize = centralPaneWidth / fieldWidth;
+
+            updateResizedPlayersX(getPrefWidth(), centralPaneWidth);
             setPrefWidth(centralPaneWidth);
+
+            updateResizedPlayersY(getPrefHeight(), fieldHeight * cellSize);
             setPrefHeight(fieldHeight * cellSize);
         } else {
             cellSize = centralPaneHeight / fieldHeight;
+
+            updateResizedPlayersX(getPrefWidth(), fieldWidth * cellSize);
             setPrefWidth(fieldWidth * cellSize);
+
+            updateResizedPlayersY(getPrefHeight(), centralPaneHeight);
             setPrefHeight(centralPaneHeight);
         }
     }
@@ -202,7 +206,19 @@ public class BattleField extends Pane {
         initPlayers();
     }
 
-    public void updatePlayers() {
-        ;
+    public void updateResizedPlayersX(Number prev, Number curr) {
+        if (firstPlayer != null && secondPlayer != null) {
+            double coefficient = curr.doubleValue() / prev.doubleValue();
+            firstPlayer.position.x *= coefficient;
+            secondPlayer.position.x *= coefficient;
+        }
+    }
+
+    public void updateResizedPlayersY(Number prev, Number curr) {
+        if (firstPlayer != null && secondPlayer != null) {
+            double coefficient = curr.doubleValue() / prev.doubleValue();
+            firstPlayer.position.y *= coefficient;
+            secondPlayer.position.y *= coefficient;
+        }
     }
 }

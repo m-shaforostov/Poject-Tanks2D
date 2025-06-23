@@ -7,7 +7,6 @@ import javafx.scene.transform.Rotate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class Tank {
     public Vector2D position;
@@ -46,18 +45,27 @@ public class Tank {
         this.player = player;
         this.battleField = battleField;
         color = player == Player.ONE ? Color.RED : Color.GREEN;
+
+        updateSize();
+
+        rotation = new Rotate();
+
+        base.getTransforms().clear();
+        muzzle.getTransforms().clear();
+        turret.getTransforms().clear();
+
+        base.getTransforms().add(rotation);
+        muzzle.getTransforms().add(rotation);
+        turret.getTransforms().add(rotation);
     }
 
-    public void setWidth(double width) {
-        this.width = width;
+    public void updateSize() {
+        this.width = battleField.cellSize * 0.3;
+        this.length = battleField.cellSize * 0.5;
     }
 
-    public void setLength(double length) {
-        this.length = length;
-    }
-
-    public void setPosition(Vector2D position) {
-        this.position = position;
+    public void setPosition(double x, double y) {
+        this.position = new Vector2D(x, y);
     }
 
     private void updateRotation(){
@@ -70,8 +78,6 @@ public class Tank {
         if (!isRotatingL && !isRotatingR) rotationSpeed = 0;
         angle = (angle + 360 + rotationSpeed * dt) % 360;
 
-        updateRotation();
-
         if (!isMoving) speed = 0;
         velocity.setAngleAndLength(-Math.PI * angle / 180.0, speed);
         Vector2D ds = velocity.getMultiplied(dt);
@@ -79,43 +85,12 @@ public class Tank {
         update();
     }
 
-    private Vector2D getNewPosition(Vector2D ds) {
-        Vector2D newPos = position.getAdded(ds);
-        if (checkBounds(newPos)) return newPos;
-        newPos = position.getAdded(new Vector2D(ds.x, 0));
-        if (checkBounds(newPos)) return newPos;
-        newPos = position.getAdded(new Vector2D(0, ds.y));
-        if (checkBounds(newPos)) return newPos;
-        return position;
-    }
-
-    private boolean checkBounds(Vector2D newPos) {
-        return newPos.x >= 0 && newPos.x < battleField.getPrefWidth() && newPos.y >= 0 && newPos.y < battleField.getPrefHeight();
-    }
-
-    public void init(){
-        speedLimit = battleField.cellSize * 1.7; // cells per second
-        speed = 0;
-        rotationSpeed = 0;
-        angle = 0;
-        isMoving = false;
-        isRotatingL = false;
-        isRotatingR = false;
-
-        rotation = new Rotate(0, position.x, position.y);
-
-        base.getTransforms().clear();
-        muzzle.getTransforms().clear();
-        turret.getTransforms().clear();
-
-        base.getTransforms().add(rotation);
-        muzzle.getTransforms().add(rotation);
-        turret.getTransforms().add(rotation);
-
-        update();
-    }
-
     public void update(){
+        speedLimit = battleField.cellSize * 1.7; // cells per second
+        updateSize();
+        updateRotation();
+        updatePositionForResizing();
+
         base.setX(position.x - length / 2);
         base.setY(position.y - width / 2);
         base.setWidth(length);
@@ -138,6 +113,24 @@ public class Tank {
         turret.setFill(color);
         turret.setStroke(Color.BLACK);
         turret.setStrokeWidth(1);
+    }
+
+    private void updatePositionForResizing() {
+
+    }
+
+    private Vector2D getNewPosition(Vector2D ds) {
+        Vector2D newPos = position.getAdded(ds);
+        if (checkBounds(newPos)) return newPos;
+        newPos = position.getAdded(new Vector2D(ds.x, 0));
+        if (checkBounds(newPos)) return newPos;
+        newPos = position.getAdded(new Vector2D(0, ds.y));
+        if (checkBounds(newPos)) return newPos;
+        return position;
+    }
+
+    private boolean checkBounds(Vector2D newPos) {
+        return newPos.x >= 0 && newPos.x < battleField.getPrefWidth() && newPos.y >= 0 && newPos.y < battleField.getPrefHeight();
     }
 
     public void startMovementForward(){
