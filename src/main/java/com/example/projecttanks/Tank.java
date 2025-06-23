@@ -7,6 +7,7 @@ import javafx.scene.transform.Rotate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class Tank {
     public Vector2D position;
@@ -73,8 +74,23 @@ public class Tank {
 
         if (!isMoving) speed = 0;
         velocity.setAngleAndLength(-Math.PI * angle / 180.0, speed);
-        position.add(velocity.getMultiplied(dt));
+        Vector2D ds = velocity.getMultiplied(dt);
+        position = getNewPosition(ds);
         update();
+    }
+
+    private Vector2D getNewPosition(Vector2D ds) {
+        Vector2D newPos = position.getAdded(ds);
+        if (checkBounds(newPos)) return newPos;
+        newPos = position.getAdded(new Vector2D(ds.x, 0));
+        if (checkBounds(newPos)) return newPos;
+        newPos = position.getAdded(new Vector2D(0, ds.y));
+        if (checkBounds(newPos)) return newPos;
+        return position;
+    }
+
+    private boolean checkBounds(Vector2D newPos) {
+        return newPos.x >= 0 && newPos.x < battleField.getPrefWidth() && newPos.y >= 0 && newPos.y < battleField.getPrefHeight();
     }
 
     public void init(){

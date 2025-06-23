@@ -154,14 +154,14 @@ public class MainGame extends Application {
     private void updatePlayer1Label() {
         if (battleField.firstPlayer.position != null)
             lbPlayer1.setText("position1: " + battleField.firstPlayer.position.x + " , " +
-                battleField.firstPlayer.position.x + " angle: " + battleField.firstPlayer.angle);
+                battleField.firstPlayer.position.y + " angle: " + battleField.firstPlayer.angle);
     }
 
     private void updatePlayer2Label() {
 //        lbPlayer2.setText("Player 2: " + "killcount" + " / " + "goal");
         if (battleField.firstPlayer.velocity != null)
             lbPlayer2.setText("velocity: " + battleField.firstPlayer.velocity.x + " , " +
-                battleField.firstPlayer.velocity.x + " speed: " + battleField.firstPlayer.speed);
+                battleField.firstPlayer.velocity.y + " speed: " + battleField.firstPlayer.speed);
     }
 
     public void btnAction(Button btn){
