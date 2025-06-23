@@ -83,6 +83,7 @@ public class Tank {
         Vector2D ds = velocity.getMultiplied(dt);
         position = getNewPosition(ds);
         update();
+        battleField.collisionDetector.defineCorners();
     }
 
     public void update(){

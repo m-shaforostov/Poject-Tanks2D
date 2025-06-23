@@ -20,6 +20,10 @@ public class BattleField extends Pane {
     public Tank firstPlayer;
     public Tank secondPlayer;
 
+    CollisionDetector collisionDetector;
+
+    List<Rectangle> walls = new ArrayList<>();
+
     BattleField(MainGame game) {
         this.game = game;
     }
@@ -37,6 +41,8 @@ public class BattleField extends Pane {
 
         getChildren().addAll(firstPlayer.base, firstPlayer.muzzle, firstPlayer.turret);
         getChildren().addAll(secondPlayer.base, secondPlayer.muzzle, secondPlayer.turret);
+
+        collisionDetector = new CollisionDetector(this, firstPlayer, secondPlayer);
     }
 
 
@@ -56,7 +62,8 @@ public class BattleField extends Pane {
     }
 
     public void draw(){
-        List<Rectangle> walls = new ArrayList<>();
+        getChildren().clear();
+        walls.clear();
         for (int x = 0; x < fieldWidth; x++) {
             for (int y = 0; y < fieldHeight; y++) {
                 List<Rectangle> elements = field[x][y].initElements();
@@ -199,9 +206,6 @@ public class BattleField extends Pane {
     public void generateBtn() {
         resetCells();
         generateMaze();
-
-        getChildren().clear();
-
         draw();
         initPlayers();
     }

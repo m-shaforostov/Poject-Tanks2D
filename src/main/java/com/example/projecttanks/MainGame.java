@@ -92,17 +92,14 @@ public class MainGame extends Application {
         borderPane.setCenter(battleField);
 
         borderPane.widthProperty().addListener((observableValue, previous, current) -> {
-            System.out.println(observableValue);
             battleField.setCellSize();
             battleField.update();
-//            battleField.updateResizedPlayersX(previous, current);
             updateMargin();
         });
 
         borderPane.heightProperty().addListener((observableValue, previous, current) -> {
             battleField.setCellSize();
             battleField.update();
-//            battleField.updateResizedPlayersY(previous, current);
             updateMargin();
         });
 
