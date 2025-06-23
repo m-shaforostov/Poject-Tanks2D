@@ -30,7 +30,7 @@ public class Cell {
     private Color BG_COLOR = Color.WHITE;
     private Color WALL_COLOR = Color.BLACK;
     private double wallNarrowSide = 0.1;
-    private double wallWideSide = 1.05;
+    private double wallWideSide = 1.1;
 
     Cell(int x, int y, double size) {
         this.x = x;
@@ -71,7 +71,7 @@ public class Cell {
         this.wallRight = wall_right;
     }
 
-    public List<Rectangle> initElements(){
+    public List<Rectangle> initElements( boolean drawBorderWalls ){
         List<Rectangle> elements = new ArrayList<>();
 
         cell = new Rectangle();
@@ -80,15 +80,15 @@ public class Cell {
 
         updateWalls();
         if (wallTop) elements.add(wallTopR);
-        if (wallBottom) elements.add(wallBottomR);
         if (wallLeft) elements.add(wallLeftR);
+        if (!drawBorderWalls) return elements;
+
         if (wallRight) elements.add(wallRightR);
+        if (wallBottom) elements.add(wallBottomR);
         return elements;
     }
 
-    private void updateWallTop() {
-        double x = position.x - wallNarrowSide * size / 2.0;
-        double y = position.y - wallNarrowSide * size / 2.0;
+    private void updateWallTop(double x, double y) {
         wallTopR.setX(x);
         wallTopR.setY(y);
         wallTopR.setWidth(wallWideSide * size);
@@ -96,9 +96,8 @@ public class Cell {
         wallTopR.setFill(WALL_COLOR);
     }
 
-    private void updateWallBottom() {
-        double x = position.x;
-        double y = position.y + size - wallNarrowSide * size / 2.0;
+    private void updateWallBottom(double x, double y) {
+        y += size;
         wallBottomR.setX(x);
         wallBottomR.setY(y);
         wallBottomR.setWidth(wallWideSide * size);
@@ -106,9 +105,7 @@ public class Cell {
         wallBottomR.setFill(WALL_COLOR);
     }
 
-    private void updateWallLeft() {
-        double x = position.x - wallNarrowSide * size / 2.0;
-        double y = position.y;
+    private void updateWallLeft(double x, double y) {
         wallLeftR.setX(x);
         wallLeftR.setY(y);
         wallLeftR.setWidth(wallNarrowSide * size);
@@ -116,9 +113,8 @@ public class Cell {
         wallLeftR.setFill(WALL_COLOR);
     }
 
-    private void updateWallRight() {
-        double x = position.x + size - wallNarrowSide * size / 2.0;
-        double y = position.y - wallNarrowSide * size / 2.0;
+    private void updateWallRight(double x, double y) {
+        x += size;
         wallRightR.setX(x);
         wallRightR.setY(y);
         wallRightR.setWidth(wallNarrowSide * size);
@@ -142,10 +138,12 @@ public class Cell {
     }
 
     private void updateWalls() {
-        updateWallTop();
-        updateWallBottom();
-        updateWallLeft();
-        updateWallRight();
+        double x = position.x - wallNarrowSide * size / 2.0;
+        double y = position.y - wallNarrowSide * size / 2.0;
+        updateWallTop(x, y);
+        updateWallBottom(x, y);
+        updateWallLeft(x, y);
+        updateWallRight(x, y);
     }
 
     public void setVisited() {

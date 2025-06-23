@@ -96,18 +96,21 @@ public class CollisionDetector {
             for (Vector2D playerCorner : playerCorners) {
                 Vector2D position = getCornerGlobalPosition(playerCorner, player);
                 if (wall.contains(new Point2D(position.x, position.y))) {
-                    System.out.println(wall);
-                    detectedWall.setFill(Color.RED);
-                    detectedWall.setX(wall.getX());
-                    detectedWall.setY(wall.getY());
-                    detectedWall.setWidth(wall.getWidth());
-                    detectedWall.setHeight(wall.getHeight());
-                    battleField.getChildren().remove(detectedWall);
-                    battleField.getChildren().add(detectedWall);
+                    colourWallCollidedWith(wall);
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private void colourWallCollidedWith(Rectangle wall) {
+        detectedWall.setFill(Color.RED);
+        detectedWall.setX(wall.getX());
+        detectedWall.setY(wall.getY());
+        detectedWall.setWidth(wall.getWidth());
+        detectedWall.setHeight(wall.getHeight());
+        battleField.getChildren().remove(detectedWall);
+        battleField.getChildren().add(detectedWall);
     }
 }

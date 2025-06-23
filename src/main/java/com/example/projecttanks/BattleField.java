@@ -68,7 +68,10 @@ public class BattleField extends Pane {
         walls.clear();
         for (int x = 0; x < fieldWidth; x++) {
             for (int y = 0; y < fieldHeight; y++) {
-                List<Rectangle> elements = field[x][y].initElements();
+                boolean drawBorderWalls = (x == fieldWidth - 1 || y == fieldHeight - 1);
+
+                List<Rectangle> elements = field[x][y].initElements(drawBorderWalls);
+
                 getChildren().addAll(elements.removeFirst()); // draw the cell
                 walls.addAll(elements); // save cell's walls
             }
