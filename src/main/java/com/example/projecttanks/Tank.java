@@ -28,6 +28,7 @@ public class Tank {
 
     public Player player;
     private Color color;
+    private CollisionDetector collision;
 
     private Integer bulletCount;
     public Integer killCount;
@@ -59,6 +60,10 @@ public class Tank {
         turret.getTransforms().add(rotation);
     }
 
+    public void setCollisionDetector(CollisionDetector collisionDetector) {
+        this.collision = collisionDetector;
+    }
+
     public void updateSize() {
         this.width = battleField.cellSize * 0.3;
         this.length = battleField.cellSize * 0.5;
@@ -77,20 +82,33 @@ public class Tank {
     public void move(double dt) {
         if (!isRotatingL && !isRotatingR) rotationSpeed = 0;
         angle = (angle + 360 + rotationSpeed * dt) % 360;
+        if (collision.isDetected(this))
+            angle = (angle + 360 - rotationSpeed * dt) % 360;
 
         if (!isMoving) speed = 0;
         velocity.setAngleAndLength(-Math.PI * angle / 180.0, speed);
-        Vector2D ds = velocity.getMultiplied(dt);
-        position = getNewPosition(ds);
+        setNewPosition(dt);
         update();
-        battleField.collisionDetector.defineCorners();
+    }
+
+    private void setNewPosition(double dt) {
+        Vector2D ds = velocity.getMultiplied(dt);
+        Vector2D currentPosition = new Vector2D(position.x, position.y);
+
+        position = currentPosition.getAdded(ds);
+        if (!collision.isDetected(this)) return;
+        position = currentPosition.getAdded(new Vector2D(ds.x, 0));
+        if (!collision.isDetected(this)) return;
+        position = currentPosition.getAdded(new Vector2D(0, ds.y));
+        if (!collision.isDetected(this)) return;
+        position = currentPosition;
+        if (collision.isDetected(this)) System.out.println("PROBLEM!!");
     }
 
     public void update(){
         speedLimit = battleField.cellSize * 1.7; // cells per second
         updateSize();
         updateRotation();
-        updatePositionForResizing();
 
         base.setX(position.x - length / 2);
         base.setY(position.y - width / 2);
@@ -114,20 +132,6 @@ public class Tank {
         turret.setFill(color);
         turret.setStroke(Color.BLACK);
         turret.setStrokeWidth(1);
-    }
-
-    private void updatePositionForResizing() {
-
-    }
-
-    private Vector2D getNewPosition(Vector2D ds) {
-        Vector2D newPos = position.getAdded(ds);
-        if (checkBounds(newPos)) return newPos;
-        newPos = position.getAdded(new Vector2D(ds.x, 0));
-        if (checkBounds(newPos)) return newPos;
-        newPos = position.getAdded(new Vector2D(0, ds.y));
-        if (checkBounds(newPos)) return newPos;
-        return position;
     }
 
     private boolean checkBounds(Vector2D newPos) {

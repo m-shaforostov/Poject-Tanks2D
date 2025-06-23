@@ -43,6 +43,8 @@ public class BattleField extends Pane {
         getChildren().addAll(secondPlayer.base, secondPlayer.muzzle, secondPlayer.turret);
 
         collisionDetector = new CollisionDetector(this, firstPlayer, secondPlayer);
+        firstPlayer.setCollisionDetector(collisionDetector);
+        secondPlayer.setCollisionDetector(collisionDetector);
     }
 
 
@@ -109,8 +111,8 @@ public class BattleField extends Pane {
 
     public void initField() {
         generateFieldDimensions();
-        fillUpFieldWithCells();
         setCellSize();
+        fillUpFieldWithCells();
         generateMaze();
     }
 
@@ -213,16 +215,20 @@ public class BattleField extends Pane {
     public void updateResizedPlayersX(Number prev, Number curr) {
         if (firstPlayer != null && secondPlayer != null) {
             double coefficient = curr.doubleValue() / prev.doubleValue();
-            firstPlayer.position.x *= coefficient;
-            secondPlayer.position.x *= coefficient;
+            firstPlayer.setPosition(firstPlayer.position.x * coefficient,
+                    firstPlayer.position.y);
+            secondPlayer.setPosition(secondPlayer.position.x * coefficient,
+                    secondPlayer.position.y);
         }
     }
 
     public void updateResizedPlayersY(Number prev, Number curr) {
         if (firstPlayer != null && secondPlayer != null) {
             double coefficient = curr.doubleValue() / prev.doubleValue();
-            firstPlayer.position.y *= coefficient;
-            secondPlayer.position.y *= coefficient;
+            firstPlayer.setPosition(firstPlayer.position.x,
+                    firstPlayer.position.y * coefficient);
+            secondPlayer.setPosition(secondPlayer.position.x,
+                    secondPlayer.position.y * coefficient);
         }
     }
 }

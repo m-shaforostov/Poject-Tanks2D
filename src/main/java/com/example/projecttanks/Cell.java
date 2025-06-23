@@ -10,7 +10,7 @@ public class Cell {
     public int x; // cells
     public int y; // cells
     public Vector2D position; // pixels
-    public double size;
+    public double size = 0;
 
     public boolean isVisited = false;
 
@@ -89,8 +89,8 @@ public class Cell {
     private void updateWallTop() {
         double x = position.x - wallNarrowSide * size / 2.0;
         double y = position.y - wallNarrowSide * size / 2.0;
-        wallTopR.setLayoutX(x);
-        wallTopR.setLayoutY(y);
+        wallTopR.setX(x);
+        wallTopR.setY(y);
         wallTopR.setWidth(wallWideSide * size);
         wallTopR.setHeight(wallNarrowSide * size);
         wallTopR.setFill(WALL_COLOR);
@@ -99,8 +99,8 @@ public class Cell {
     private void updateWallBottom() {
         double x = position.x;
         double y = position.y + size - wallNarrowSide * size / 2.0;
-        wallBottomR.setLayoutX(x);
-        wallBottomR.setLayoutY(y);
+        wallBottomR.setX(x);
+        wallBottomR.setY(y);
         wallBottomR.setWidth(wallWideSide * size);
         wallBottomR.setHeight(wallNarrowSide * size);
         wallBottomR.setFill(WALL_COLOR);
@@ -109,8 +109,8 @@ public class Cell {
     private void updateWallLeft() {
         double x = position.x - wallNarrowSide * size / 2.0;
         double y = position.y;
-        wallLeftR.setLayoutX(x);
-        wallLeftR.setLayoutY(y);
+        wallLeftR.setX(x);
+        wallLeftR.setY(y);
         wallLeftR.setWidth(wallNarrowSide * size);
         wallLeftR.setHeight(wallWideSide * size);
         wallLeftR.setFill(WALL_COLOR);
@@ -119,8 +119,8 @@ public class Cell {
     private void updateWallRight() {
         double x = position.x + size - wallNarrowSide * size / 2.0;
         double y = position.y - wallNarrowSide * size / 2.0;
-        wallRightR.setLayoutX(x);
-        wallRightR.setLayoutY(y);
+        wallRightR.setX(x);
+        wallRightR.setY(y);
         wallRightR.setWidth(wallNarrowSide * size);
         wallRightR.setHeight(wallWideSide * size);
         wallRightR.setFill(WALL_COLOR);
