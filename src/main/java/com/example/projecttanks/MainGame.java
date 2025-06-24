@@ -173,7 +173,12 @@ public class MainGame extends Application {
     }
 
     private void updateTimeLabel() {
-        lbTime.setText("Time: " + time + " / " + timeLimit);
+        lbTime.setTextFill(Color.BLACK);
+        lbTime.setText("Time: " + time);
+        if (battleField.gameState.isRoundOver) {
+            lbTime.setTextFill(Color.RED);
+            lbTime.setText("Time: " + battleField.gameState.countDown);
+        }
     }
 
     private void updatePlayer1Label() {
