@@ -13,55 +13,75 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+/**
+ * The lobby screen for the Tanks2D game application.
+ * Displays the name of the game and two buttons allowing to start the game of to quit the application.
+ */
 public class LobbyPane extends Pane {
-    MainGame game;
+    private final MainGame game;
 
-    public Button start = new Button("Start");
-    public Button quit = new Button("Quit");
-    private Rectangle lobbyBG = new Rectangle(0, 0);
-    Text text = new Text("Tanks Battle!");
-    double shadowOffsetStartBtn = 5;
-    double shadowOffsetQuitBtn = 5;
+    private final Rectangle lobbyBG = new Rectangle(0, 0);
+    private final Text text = new Text("Tanks Battle!");
+    private final Button start = new Button("Start");
+    private final Button quit = new Button("Quit");
+
+    private static final double GAP_BETWEEN_BUTTONS = 50;
+    private final double lobbyBtnWidth = 120;
+    private final double lobbyBtnHeight = 50;
+    private double shadowOffsetStartBtn = 5;
+    private double shadowOffsetQuitBtn = 5;
 
     private final Background lobbyBtnBackground = new Background(new BackgroundFill(Color.DARKGREEN, new CornerRadii(5), null));
     private final Font lobbyBtnFont = Font.font("System", FontWeight.BOLD, 16);
     private final Color lobbyBtnColor = Color.BLACK;
-    public final DropShadow shadow = new DropShadow(5, 3, 3, Color.BLACK);
+    private final DropShadow shadow = new DropShadow(5, 3, 3, Color.BLACK);
 
-    private final double lobbyBtnWidth = 120;
-    private final double lobbyBtnHeight = 50;
-    private static final double GAP_BETWEEN_BUTTONS = 50;
-
-
+    /**
+     * Constructs the lobby pane.
+     * Saves reference to the main game instance.
+     * Binds mouse event handlers to the "Start" and "Quit" buttons.
+     * Sets {@link AppState} value to Lobby.
+     * Draws background, text and buttons on the scene
+     * @param game the main game instance
+     */
     LobbyPane(MainGame game) {
         this.game = game;
+
+        start.setOnMousePressed(this::lobbyBtnPressed);
+        start.setOnMouseReleased(this::lobbyBtnReleased);
+
+        quit.setOnMousePressed(this::lobbyBtnPressed);
+        quit.setOnMouseReleased(this::lobbyBtnReleased);
+
+        game.setAppState(AppState.LOBBY);
+        draw();
     }
 
-    public void draw() {
-        if (game.appState == AppState.LOBBY) {
+    private void draw() {
+        if (game.getAppState() == AppState.LOBBY) {
             buttonInit(start);
             buttonInit(quit);
             update();
 
-            game.lobbyPane.getChildren().add(lobbyBG);
-            game.lobbyPane.getChildren().add(start);
-            game.lobbyPane.getChildren().add(quit);
-            game.lobbyPane.getChildren().add(text);
+            getChildren().add(lobbyBG);
+            getChildren().add(start);
+            getChildren().add(quit);
+            getChildren().add(text);
         }
     }
 
     private void colorBG() {
         lobbyBG.setFill(Color.rgb(70, 120, 80));
-        lobbyBG.setWidth(game.lobbyPane.getWidth());
-        lobbyBG.setHeight(game.lobbyPane.getHeight());
+        lobbyBG.setWidth(getWidth());
+        lobbyBG.setHeight(getHeight());
     }
 
     private void updateLobbyText() {
         text.setFill(Color.BLACK);
         text.setStrokeWidth(2);
         text.setFont(Font.font("System", FontWeight.BOLD, 50));
-        text.setLayoutX(game.lobbyPane.getWidth() / 2 - text.getLayoutBounds().getWidth() / 2);
-        text.setLayoutY(game.lobbyPane.getHeight() / 2 - text.getLayoutBounds().getHeight());
+        text.setLayoutX(getWidth() / 2 - text.getLayoutBounds().getWidth() / 2);
+        text.setLayoutY(getHeight() / 2 - text.getLayoutBounds().getHeight());
     }
 
     private void buttonInit(Button btn) {
@@ -74,12 +94,12 @@ public class LobbyPane extends Pane {
     }
 
     private void updateAllBtns(){
-        double posY = game.lobbyPane.getHeight() / 2 - lobbyBtnHeight / 2;
+        double posY = getHeight() / 2 - lobbyBtnHeight / 2;
 
-        double startPosX = game.lobbyPane.getWidth() / 2 - lobbyBtnWidth - GAP_BETWEEN_BUTTONS / 2;
+        double startPosX = getWidth() / 2 - lobbyBtnWidth - GAP_BETWEEN_BUTTONS / 2;
         updateBtn(startPosX, posY, start, shadowOffsetStartBtn);
 
-        double quitPosX = game.lobbyPane.getWidth() / 2 + GAP_BETWEEN_BUTTONS / 2;
+        double quitPosX = getWidth() / 2 + GAP_BETWEEN_BUTTONS / 2;
         updateBtn(quitPosX, posY, quit, shadowOffsetQuitBtn);
     }
 
@@ -88,7 +108,7 @@ public class LobbyPane extends Pane {
         btn.setLayoutY(posY - offset);
     }
 
-    public void lobbyBtnPressed(MouseEvent e) {
+    private void lobbyBtnPressed(MouseEvent e) {
         Button btn = (Button) e.getSource();
         if (btn == start) {
             shadowOffsetStartBtn = 0;
@@ -98,7 +118,7 @@ public class LobbyPane extends Pane {
         btn.setEffect(null);
     }
 
-    public void lobbyBtnReleased(MouseEvent e) {
+    private void lobbyBtnReleased(MouseEvent e) {
         Button btn = (Button) e.getSource();
         if (btn == start) {
             shadowOffsetStartBtn = 5;
@@ -106,9 +126,13 @@ public class LobbyPane extends Pane {
             shadowOffsetQuitBtn = 5;
         }
         btn.setEffect(shadow);
-        game.btnAction(btn);
+        game.btnAction(btn.getText());
     }
 
+    /**
+     * Updates background size, buttons and text position to fit the window.
+     * Used for resizing.
+     */
     public void update() {
         colorBG();
         updateLobbyText();

@@ -4,7 +4,7 @@ public class GameState {
     MainGame game;
 
     public static final int ROUNDS_TO_WIN = 2;
-    public static final int LAST_SECONDS_TO_LIVE = 4;
+    public static final int LAST_SECONDS_TO_LIVE = 3;
     public static final int LAST_SECONDS_FOR_INFO = 2;
 
     public int currentRound = 1;
@@ -71,7 +71,7 @@ public class GameState {
             }
         }
         resetForNewRound();
-        if (isGameOver) game.endTheGame(winner);
+        if (isGameOver) game.displayWinner(winner);
     }
 
     private void resetForNewRound() {
@@ -83,7 +83,7 @@ public class GameState {
     }
 
     public void newRound(){
-        game.btnAction(game.newRound);
+        game.btnAction("New round");
     }
 
     public void decrementCountDown() {

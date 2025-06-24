@@ -119,8 +119,8 @@ public class BattleField extends Pane {
     }
 
     public void setCellSize(){
-        double centralPaneHeight = game.borderPane.getHeight() - 100;
-        double centralPaneWidth = game.borderPane.getWidth();
+        double centralPaneHeight = game.getBorderpaneHeight() - 100;
+        double centralPaneWidth = game.getBorderpaneWidth();
         double centralPaneRatio = (double) centralPaneWidth / centralPaneHeight;
 
         double battleFieldRatio = (double) fieldWidth / fieldHeight;

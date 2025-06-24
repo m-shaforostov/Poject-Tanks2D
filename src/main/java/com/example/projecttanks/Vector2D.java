@@ -1,5 +1,7 @@
 package com.example.projecttanks;
 
+// https://gist.github.com/gunvirranu/6816d65c0231981787ebefd3bdb61f98
+// knižnica na vektorovú algebru z domácich úloh
 public class Vector2D {
 
     public double x;

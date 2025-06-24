@@ -219,7 +219,7 @@ public class Tank {
 
     public void die() {
         isDead = true;
-        color = Color.rgb(20, 20, 20);
+        color = Color.rgb(70, 70, 70);
         update();
     }
 }
