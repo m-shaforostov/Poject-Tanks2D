@@ -8,39 +8,65 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Represents the battlefield where the main game takes place.
+ * Handles maze generation, player positioning and resizing logic.
+ * Is the central container for whole tank-related gameplay.
+ */
 public class BattleField extends Pane {
-    MainGame game;
-    CollisionDetector collisionDetector;
-    GameState gameState;
+    private final MainGame game;
+    private CollisionDetector collisionDetector;
+    /**
+     * Instance of the {@link GameState}
+     */
+    public GameState gameState;
 
-    public Cell[][] field;
-    private static int[] dimensions = new int[]{3, 4, 5, 6, 7, 8, 9, 10};
-    public int fieldWidth;
-    public int fieldHeight;
-    public double cellSize;
+    private Cell[][] field;
+    private static final int[] dimensions = new int[]{3, 4, 5, 6, 7, 8, 9, 10};
+    private int fieldWidth;
+    private int fieldHeight;
+    private double cellSize;
+
+    private final List<Rectangle> walls = new ArrayList<>();
 
     private static final int closedCellRate = 30;
-    Random rand = new Random();
+    private static final Random rand = new Random();
 
-    public List<Tank> tanks = new ArrayList<Tank>();
+    /**
+     * Instance of the {@link Tank}.
+     * Represents tank of the {@link Player} one.
+     */
     public Tank firstPlayer;
+
+    /**
+     * Instance of the {@link Tank}.
+     * Represents tank of the {@link Player} two.
+     */
     public Tank secondPlayer;
 
-    List<Rectangle> walls = new ArrayList<>();
-
+    /**
+     * Constructs the battlefield.
+     * @param game the main game instance.
+     */
     BattleField(MainGame game) {
         this.game = game;
     }
 
+    /**
+     * Initializes a new game state and saves it.
+     */
     public void initGameState(){
         this.gameState = new GameState(game);
     }
 
+    /**
+     * Initializes two players in instance of {@link Tank} and saves them.
+     * Generates random but valid starting positions for the tanks.
+     * Draws tanks on the battlefield and sets up a collision detection mechanism for both of them.
+     */
     public void initPlayers() {
         firstPlayer = new Tank(Player.ONE, this);
         secondPlayer = new Tank(Player.TWO, this);
-        tanks.add(firstPlayer);
-        tanks.add(secondPlayer);
 
         generatePlayersPosition();
 
@@ -54,7 +80,6 @@ public class BattleField extends Pane {
         firstPlayer.setCollisionDetector(collisionDetector);
         secondPlayer.setCollisionDetector(collisionDetector);
     }
-
 
     private void generatePlayersPosition() {
         int spawnAreaWidth = fieldWidth / 2;
@@ -78,6 +103,11 @@ public class BattleField extends Pane {
         }
     }
 
+    /**
+     * Clears the pane.
+     * For every initialized cell gets all needed elements (background rectangle and walls).
+     * Then displays them on the pane.
+     */
     public void draw(){
         getChildren().clear();
         walls.clear();
@@ -85,10 +115,9 @@ public class BattleField extends Pane {
         for (int x = 0; x < fieldWidth; x++) {
             for (int y = 0; y < fieldHeight; y++) {
                 boolean drawBorderWalls = (x == fieldWidth - 1 || y == fieldHeight - 1);
-
                 List<Rectangle> elements = field[x][y].initElements(drawBorderWalls);
 
-                getChildren().addAll(elements.removeFirst()); // draw the cell
+                getChildren().addAll(elements.removeFirst()); // draw the cell background
                 walls.addAll(elements); // save cell's walls
             }
         }
@@ -103,22 +132,7 @@ public class BattleField extends Pane {
         getChildren().add(background);
     }
 
-    public void update() {
-        setCellSize();
-        updateCellSize();
-        updatePlayers();
-        if (collisionDetector != null) collisionDetector.defineWallsCorners();
-    }
-
-    private void updateCellSize() {
-        for (int x = 0; x < fieldWidth; x++) {
-            for (int y = 0; y < fieldHeight; y++) {
-                field[x][y].updateSize(cellSize);
-            }
-        }
-    }
-
-    public void setCellSize(){
+    private void setCellSize(){
         double centralPaneHeight = game.getBorderpaneHeight() - 100;
         double centralPaneWidth = game.getBorderpaneWidth();
         double centralPaneRatio = (double) centralPaneWidth / centralPaneHeight;
@@ -143,6 +157,20 @@ public class BattleField extends Pane {
         }
     }
 
+    private void updateCellSize() {
+        for (int x = 0; x < fieldWidth; x++) {
+            for (int y = 0; y < fieldHeight; y++) {
+                field[x][y].updateSize(cellSize);
+            }
+        }
+    }
+
+    /**
+     * Initializes the field by generating random dimensions of the field,
+     * Calculating the size of the cells,
+     * Constructing instances of {@link Cell} and filling up the field with them,
+     * Then generating a correct maze, which will be the battlefield.
+     */
     public void initField() {
         generateFieldDimensions();
         setCellSize();
@@ -150,7 +178,7 @@ public class BattleField extends Pane {
         generateMaze();
     }
 
-    public void generateFieldDimensions() {
+    private void generateFieldDimensions() {
         Random rand = new Random();
         fieldWidth = dimensions[rand.nextInt(dimensions.length)];
         fieldHeight = dimensions[rand.nextInt(dimensions.length)];
@@ -167,8 +195,24 @@ public class BattleField extends Pane {
         }
     }
 
+    private void generateMaze() {
+        generateClosedCells();
+        Cell start = getStartCell();
+        backTrack(null, start);
+    }
 
-    public void setCellsConnection(boolean isConnected, Cell cell1, Cell cell2){
+    private void generateClosedCells() {
+        for (int x = 0; x < fieldWidth; x++) {
+            for (int y = 0; y < fieldHeight; y++) {
+                if (rand.nextInt(closedCellRate) == 0) {
+                    field[x][y].isVisited = true;
+                    field[x][y].isClosed = true;
+                }
+            }
+        }
+    }
+
+    private void setCellsConnection(boolean isConnected, Cell cell1, Cell cell2){
         int x1 = cell1.getX();
         int y1 = cell1.getY();
         int x2 = cell2.getX();
@@ -188,23 +232,6 @@ public class BattleField extends Pane {
         } else if (y1 > y2){
             cell1.setWallTop(isConnected);
             cell2.setWallBottom(isConnected);}
-    }
-
-    private void generateMaze() {
-        generateClosedCells();
-        Cell start = getStartCell();
-        backTrack(null, start);
-    }
-
-    private void generateClosedCells() {
-        for (int x = 0; x < fieldWidth; x++) {
-            for (int y = 0; y < fieldHeight; y++) {
-                if (rand.nextInt(closedCellRate) == 0) {
-                    field[x][y].isVisited = true;
-                    field[x][y].isClosed = true;
-                }
-            }
-        }
     }
 
     private void backTrack(Cell previous, Cell current) {
@@ -244,14 +271,12 @@ public class BattleField extends Pane {
         return getStartCell();
     }
 
-    public void resetCells() {
-        for (int x = 0; x < fieldWidth; x++) {
-            for (int y = 0; y < fieldHeight; y++) {
-                field[x][y].reset();
-            }
-        }
-    }
-
+    /**
+     * Handles "Generate" button.
+     * Resets all cells to their initial state,
+     * Generates the maze,
+     * Draws it, and initialises players.
+     */
     public void generateBtn() {
         resetCells();
         generateMaze();
@@ -259,14 +284,21 @@ public class BattleField extends Pane {
         initPlayers();
     }
 
-    public void updateResizedItemsX(Number prev, Number curr) {
+    private void resetCells() {
+        for (int x = 0; x < fieldWidth; x++) {
+            for (int y = 0; y < fieldHeight; y++) {
+                field[x][y].reset();
+            }
+        }
+    }
+
+    private void updateResizedItemsX(Number prev, Number curr) {
         double coefficient = curr.doubleValue() / prev.doubleValue();
         updateResizedPlayerAndBullets(firstPlayer, coefficient, 1);
         updateResizedPlayerAndBullets(secondPlayer, coefficient, 1);
-
     }
 
-    public void updateResizedPlayersY(Number prev, Number curr) {
+    private void updateResizedPlayersY(Number prev, Number curr) {
         double coefficient = curr.doubleValue() / prev.doubleValue();
         updateResizedPlayerAndBullets(firstPlayer, 1, coefficient);
         updateResizedPlayerAndBullets(secondPlayer, 1, coefficient);
@@ -281,7 +313,17 @@ public class BattleField extends Pane {
         }
     }
 
-    public void updatePlayers() {
+    /**
+     * Updates the battlefield elements size and position after window resizing
+     */
+    public void update() {
+        setCellSize();
+        updateCellSize();
+        updatePlayers();
+        if (collisionDetector != null) collisionDetector.defineWallsCorners();
+    }
+
+    private void updatePlayers() {
         if (firstPlayer != null) {
             firstPlayer.update();
             firstPlayer.updateBulletsSize();
@@ -291,4 +333,15 @@ public class BattleField extends Pane {
             secondPlayer.updateBulletsSize();
         }
     }
+
+    /**
+     * @return size of the cell in px.
+     */
+    public double getCellSize() {return cellSize;}
+
+    /**
+     * returns the list of all walls displayed on the battlefield
+     * @return list of the walls (Rectangles)
+     */
+    public List<Rectangle> getWalls() {return walls;}
 }

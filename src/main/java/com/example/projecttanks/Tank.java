@@ -77,8 +77,8 @@ public class Tank {
     }
 
     public void updateSize() {
-        this.width = battleField.cellSize * 0.3;
-        this.length = battleField.cellSize * 0.4;
+        this.width = battleField.getCellSize() * 0.3;
+        this.length = battleField.getCellSize() * 0.4;
     }
 
     public void setPosition(double x, double y) {
@@ -120,7 +120,7 @@ public class Tank {
     }
 
     public void update(){
-        tankSpeedLimit = battleField.cellSize * 1.7; // cells per second
+        tankSpeedLimit = battleField.getCellSize() * 1.7; // cells per second
         bulletSpeedLimit = tankSpeedLimit * 1.2;
         updateSize();
         updateRotation();

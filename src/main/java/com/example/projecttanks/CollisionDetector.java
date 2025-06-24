@@ -31,7 +31,7 @@ public class CollisionDetector {
         this.battleField = battleField;
         this.player1 = player1;
         this.player2 = player2;
-        this.walls = battleField.walls;
+        this.walls = battleField.getWalls();
 
         definePlayerCorners();
         defineWallsCorners();
