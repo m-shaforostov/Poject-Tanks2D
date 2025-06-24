@@ -6,6 +6,7 @@ public abstract class Projectile {
     public double speed;
     public Tank player;
     public BattleField battleField;
+    public GameState gameState;
     public CollisionDetector collision;
 
     public boolean isDestroyed = false;
@@ -15,6 +16,7 @@ public abstract class Projectile {
         this.velocity = velocity;
         this.player = player;
         this.battleField = battleField;
+        this.gameState = battleField.gameState;
         this.collision = battleField.collisionDetector;
     }
 
@@ -34,5 +36,8 @@ public abstract class Projectile {
     public abstract void calculatePosition(double dt);
     public abstract void updatePosition();
     public abstract void draw();
+
+    public abstract void eliminate();
+    public abstract void kill(Tank player);
 }
 

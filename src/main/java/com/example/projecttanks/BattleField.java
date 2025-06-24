@@ -10,6 +10,9 @@ import java.util.Random;
 
 public class BattleField extends Pane {
     MainGame game;
+    CollisionDetector collisionDetector;
+    GameState gameState;
+
     public Cell[][] field;
     private static int[] dimensions = new int[]{3, 4, 5, 6, 7, 8, 9, 10};
     public int fieldWidth;
@@ -23,12 +26,14 @@ public class BattleField extends Pane {
     public Tank firstPlayer;
     public Tank secondPlayer;
 
-    CollisionDetector collisionDetector;
-
     List<Rectangle> walls = new ArrayList<>();
 
     BattleField(MainGame game) {
         this.game = game;
+    }
+
+    public void initGameState(){
+        this.gameState = new GameState(game);
     }
 
     public void initPlayers() {
@@ -188,7 +193,6 @@ public class BattleField extends Pane {
                 if (rand.nextInt(closedCellRate) == 0) {
                     field[x][y].isVisited = true;
                     field[x][y].isClosed = true;
-                    System.out.println("Closed: " + x + ", " + y);
                 }
             }
         }

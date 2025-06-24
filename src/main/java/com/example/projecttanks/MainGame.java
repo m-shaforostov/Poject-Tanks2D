@@ -11,6 +11,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -20,13 +24,16 @@ public class MainGame extends Application {
     public static int LOBBY_HEIGHT = 600;
     public static double REFRESH_TIME_MS = 16;
 
-    public GameState gameState;
+    public AppState appState;
     LobbyPane lobbyPane;
     Scene lobbyScene;
     BorderPane borderPane = new BorderPane();
     BattleField battleField;
     Scene battleScene;
     Stage stage;
+
+    private Rectangle winTable = new Rectangle();
+    private Text winText = new Text();
 
     Button quit = new Button("Quit");
     Button generate = new Button("Generate");
@@ -60,7 +67,7 @@ public class MainGame extends Application {
         lobbyPane.quit.setOnMousePressed(e -> lobbyPane.lobbyBtnPressed(e));
         lobbyPane.quit.setOnMouseReleased(e -> lobbyPane.lobbyBtnReleased(e)); // lobby quit
 
-        gameState = GameState.LOBBY;
+        appState = AppState.LOBBY;
         lobbyPane.draw();
 
         // ButtleField
@@ -107,12 +114,15 @@ public class MainGame extends Application {
         newRound.setOnAction(e -> btnAction(newRound));
         home.setOnAction(e -> btnAction(home));
 
+        setWinWindow();
+
         Timeline animation = getAnimation();
         animation.play();
 
         Timeline timeline = new Timeline(new KeyFrame(new Duration(1000), e -> {
-            if (gameState == GameState.GAME){
+            if (appState == AppState.GAME){
                 time++;
+                if (battleField.gameState.isRoundOver) battleField.gameState.decrementCountDown();
             }
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -125,17 +135,37 @@ public class MainGame extends Application {
         stage.show();
     }
 
+    private void setWinWindow() {
+        double width = 200;
+        double height = 80;
+        winTable.xProperty().bind(battleField.widthProperty().divide(2).subtract(width / 2));
+        winTable.yProperty().bind(battleField.heightProperty().divide(2).subtract(height / 2));
+
+        winTable.setWidth(width);
+        winTable.setHeight(height);
+
+        winTable.setFill(Color.WHITE);
+        winTable.setStroke(Color.BLACK);
+
+        winText.setFont(new Font(20));
+        winText.xProperty().bind(battleField.widthProperty().divide(2).subtract(width / 2 - 25));
+        winText.yProperty().bind(battleField.heightProperty().divide(2).add(5));
+    }
+
     private Timeline getAnimation() {
         Timeline animation = new Timeline(new KeyFrame(new Duration(REFRESH_TIME_MS), e -> {
-            if (gameState == GameState.LOBBY) {
+            if (appState == AppState.LOBBY) {
                 lobbyPane.update();
-            } else if (gameState == GameState.GAME){
+            } else if (appState == AppState.GAME){
                 battleField.firstPlayer.move(REFRESH_TIME_MS / 1000);
+                battleField.firstPlayer.updateBullets(REFRESH_TIME_MS / 1000);
+
                 battleField.secondPlayer.move(REFRESH_TIME_MS / 1000);
-                unfocus();
-                updateTimeLabel();
-                updatePlayer1Label();
-                updatePlayer2Label();
+                battleField.secondPlayer.updateBullets(REFRESH_TIME_MS / 1000);
+
+                updateLabels();
+            } else if (appState == AppState.END){
+                updateLabels();
             }
         }));
         animation.setCycleCount(Timeline.INDEFINITE);
@@ -143,42 +173,40 @@ public class MainGame extends Application {
     }
 
     private void updateTimeLabel() {
-//        lbTime.setText("Time: " + time + " / " + timeLimit);
-        lbTime.setText("");
-
+        lbTime.setText("Time: " + time + " / " + timeLimit);
     }
 
     private void updatePlayer1Label() {
-        if (battleField.firstPlayer.position != null)
-            lbPlayer1.setText("position1: " + battleField.firstPlayer.position.x + " , " +
-                battleField.firstPlayer.position.y + " angle: " + battleField.firstPlayer.angle);
+        lbPlayer1.setText("Player 1: " + battleField.gameState.roundsWon1 + " / " + GameState.ROUNDS_TO_WIN);
     }
 
     private void updatePlayer2Label() {
-//        lbPlayer2.setText("Player 2: " + "killcount" + " / " + "goal");
-        if (battleField.firstPlayer.velocity != null)
-            lbPlayer2.setText("velocity: " + battleField.firstPlayer.velocity.x + " , " +
-                battleField.firstPlayer.velocity.y + " speed: " + battleField.firstPlayer.speed);
+        lbPlayer2.setText("Player 2: " + battleField.gameState.roundsWon2 + " / " + GameState.ROUNDS_TO_WIN);
     }
 
     public void btnAction(Button btn){
         if (btn == lobbyPane.start) {
             stage.setScene(battleScene);
+            battleField.initGameState();
             startNewRound();
             unfocus();
         }
         else if (btn == generate) {
             resetTime();
+            battleField.gameState.evaluateRound();
+            if (appState == AppState.END) return;
             battleField.generateBtn();
             unfocus();
         }
         else if (btn == newRound) {
+            battleField.gameState.evaluateRound();
+            if (appState == AppState.END) return;
             battleField.getChildren().clear();
             startNewRound();
             unfocus();
         }
         else if (btn == home) {
-            gameState = GameState.LOBBY;
+            appState = AppState.LOBBY;
             battleField.getChildren().clear();
             stage.setScene(lobbyScene);
         }
@@ -192,18 +220,19 @@ public class MainGame extends Application {
     }
 
     public void startNewRound(){
-        gameState = GameState.PAUSE;
+        appState = AppState.PAUSE;
         battleField.initField();
 
         updateMargin();
         battleField.draw();
         battleField.initPlayers();
+        resetTime();
         updateLabels();
-        gameState = GameState.GAME;
+        appState = AppState.GAME;
     }
 
     private void updateLabels(){
-        resetTime();
+        unfocus();
         updateTimeLabel();
         updatePlayer1Label();
         updatePlayer2Label();
@@ -224,7 +253,7 @@ public class MainGame extends Application {
 
     private void setKeyEvents() {
         battleScene.setOnKeyPressed(event -> {
-            if (gameState == GameState.GAME) {
+            if (appState == AppState.GAME) {
                 switch (event.getCode()) {
                     case LEFT:
                         battleField.secondPlayer.startRotationL();
@@ -261,7 +290,7 @@ public class MainGame extends Application {
             }
         });
         battleScene.setOnKeyReleased(event -> {
-            if (gameState == GameState.GAME) {
+            if (appState == AppState.GAME) {
                 switch (event.getCode()) {
                     case LEFT:
                         battleField.secondPlayer.stopRotationL();
@@ -287,5 +316,13 @@ public class MainGame extends Application {
                 }
             }
         });
+    }
+
+    public void endTheGame(Player winner) {
+        appState = AppState.END;
+
+        winText.setText("Player " + winner + " won!" );
+        battleField.getChildren().removeAll(winTable, winText);
+        battleField.getChildren().addAll(winTable, winText);
     }
 }

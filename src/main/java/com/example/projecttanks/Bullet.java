@@ -24,7 +24,7 @@ public class Bullet extends Projectile {
 
     @Override
     public void update(double dt) {
-        if(isDestroyed || System.currentTimeMillis() >= end) explode();
+        if(isDestroyed || System.currentTimeMillis() >= end) eliminate();
         else calculatePosition(dt);
         updatePosition();
     }
@@ -52,12 +52,10 @@ public class Bullet extends Projectile {
         if (collision.isDetectedBulletVertical(this))
             velocity.y *= -1;
         if (collision.isDetectedBulletWithPlayer(this, battleField.firstPlayer)){
-            explode();
-            System.out.println("COLLIDED WITH " + Player.ONE);
+            kill(battleField.firstPlayer);
         }
         else if (collision.isDetectedBulletWithPlayer(this, battleField.secondPlayer)){
-            explode();
-            System.out.println("COLLIDED WITH " + Player.TWO);
+            kill(battleField.secondPlayer);
         }
         position = currentPosition.getAdded(velocity.getMultiplied(dt));
     }
@@ -75,7 +73,8 @@ public class Bullet extends Projectile {
         battleField.getChildren().add(bulletCircle);
     }
 
-    private void explode() {
+    @Override
+    public void eliminate() {
         isDestroyed = true;
         radius -= disappearanceStep;
         bulletCircle.setRadius(radius);
@@ -83,5 +82,15 @@ public class Bullet extends Projectile {
             battleField.getChildren().remove(bulletCircle);
             player.removeProjectile(this);
         }
+    }
+
+    @Override
+    public void kill(Tank victim){
+        isDestroyed = true;
+        battleField.getChildren().remove(bulletCircle);
+        player.removeProjectile(this);
+
+        gameState.murdered(player, victim);
+        victim.die();
     }
 }

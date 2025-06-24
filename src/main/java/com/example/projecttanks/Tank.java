@@ -26,6 +26,7 @@ public class Tank {
     private boolean isMoving = false;
     private boolean isRotatingL = false;
     private boolean isRotatingR = false;
+    private boolean isDead = false;
 
     public Player player;
     private Color color;
@@ -35,9 +36,6 @@ public class Tank {
     private int projectilesCount = PROJECTILES_LIMIT;
     public List<Projectile> firedProjectiles = new ArrayList<>();
     public List<Projectile> projectilesToRemove = new ArrayList<>();
-
-    public int killCount;
-    public int deathCount;
 
     private List<Bonus> bonusesEarned = new ArrayList<>();
     public Bonus activeBonus = null;
@@ -97,6 +95,7 @@ public class Tank {
     }
 
     public void move(double dt) {
+        if (isDead) return;
         if (!isRotatingL && !isRotatingR) rotationSpeed = 0;
         angle = (angle + 360 + rotationSpeed * dt) % 360;
         if (collision.isDetectedForPlayer(this))
@@ -106,7 +105,6 @@ public class Tank {
         velocity.setAngleAndLength(-Math.PI * angle / 180.0, speed);
         setNewPosition(dt);
         update();
-        updateBullets(dt);
     }
 
     private void setNewPosition(double dt) {
@@ -189,6 +187,7 @@ public class Tank {
     }
 
     public void shoot() {
+        if (isDead) return;
         if (projectilesCount == 0) return;
         Vector2D deltaPosition = new Vector2D();
         deltaPosition.setAngleAndLength(-Math.PI * angle / 180.0, length * muzzleLengthCoefficient);
@@ -204,7 +203,7 @@ public class Tank {
         projectilesCount++;
     }
 
-    private void updateBullets(double dt) {
+    public void updateBullets(double dt) {
         for (Projectile projectile : firedProjectiles) {
             projectile.update(dt);
         }
@@ -219,5 +218,11 @@ public class Tank {
             projectile.updateSize();
             projectile.updateSpeed();
         }
+    }
+
+    public void die() {
+        isDead = true;
+        color = Color.rgb(20, 20, 20);
+        update();
     }
 }

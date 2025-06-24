@@ -38,7 +38,7 @@ public class LobbyPane extends Pane {
     }
 
     public void draw() {
-        if (game.gameState == GameState.LOBBY) {
+        if (game.appState == AppState.LOBBY) {
             buttonInit(start);
             buttonInit(quit);
             update();
