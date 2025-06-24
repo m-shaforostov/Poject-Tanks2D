@@ -4,13 +4,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 public class Bullet extends Projectile {
-    private int LIVE_TIME_SEC = 10;
+    private int LIVE_TIME_SEC = 3;
     private final long start = System.currentTimeMillis();
     private final long end = start + (LIVE_TIME_SEC) * 1000;
 
-    public static double RADIUS = 5;
+    public double radius = 5;
     public static Color BULLET_COLOR = Color.BLACK;
     Circle bulletCircle;
+
+    private static final double disappearanceTime = 0.1;
+    private final double disappearanceStep = radius * MainGame.REFRESH_TIME_MS / (disappearanceTime * 1000);
 
     Bullet(Vector2D position, Vector2D velocity, Tank player, BattleField battleField) {
         super(position, velocity, player, battleField);
@@ -19,8 +22,10 @@ public class Bullet extends Projectile {
 
     public void update(double dt) {
         if(System.currentTimeMillis() >= end) explode();
-        calculatePosition(dt);
-        updatePosition();
+        else {
+            calculatePosition(dt);
+            updatePosition();
+        }
     }
 
     public void calculatePosition(double dt) {
@@ -39,13 +44,17 @@ public class Bullet extends Projectile {
     }
 
     public void draw() {
-        bulletCircle = new Circle(position.x, position.y, RADIUS, BULLET_COLOR);
+        bulletCircle = new Circle(position.x, position.y, radius, BULLET_COLOR);
         battleField.getChildren().remove(bulletCircle);
         battleField.getChildren().add(bulletCircle);
     }
 
     private void explode() {
-        battleField.getChildren().remove(bulletCircle);
-        player.removeProjectile(this);
+        radius -= disappearanceStep;
+        bulletCircle.setRadius(radius);
+        if (radius <= 0) {
+            battleField.getChildren().remove(bulletCircle);
+            player.removeProjectile(this);
+        }
     }
 }

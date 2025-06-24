@@ -167,7 +167,7 @@ public class CollisionDetector {
     public boolean isDetectedBulletHorizontal(Bullet bullet) {
         double x = bullet.position.x;
         double y = bullet.position.y;
-        double r = bullet.RADIUS;
+        double r = bullet.radius;
         for (Rectangle wall : walls) {
             if (wall.contains(new Point2D(x + r, y)) ||
                     wall.contains(new Point2D(x - r, y))) {
@@ -181,7 +181,7 @@ public class CollisionDetector {
     public boolean isDetectedBulletVertical(Bullet bullet) {
         double x = bullet.position.x;
         double y = bullet.position.y;
-        double r = bullet.RADIUS;
+        double r = bullet.radius;
         for (Rectangle wall : walls) {
             if (wall.contains(new Point2D(x, y + r)) ||
                     wall.contains(new Point2D(x, y - r))) {

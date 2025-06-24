@@ -18,6 +18,7 @@ import javafx.util.Duration;
 public class MainGame extends Application {
     public static int LOBBY_WIDTH = 1000;
     public static int LOBBY_HEIGHT = 600;
+    public static double REFRESH_TIME_MS = 16;
 
     public GameState gameState;
     LobbyPane lobbyPane;
@@ -125,12 +126,12 @@ public class MainGame extends Application {
     }
 
     private Timeline getAnimation() {
-        Timeline animation = new Timeline(new KeyFrame(new Duration(16), e -> {
+        Timeline animation = new Timeline(new KeyFrame(new Duration(REFRESH_TIME_MS), e -> {
             if (gameState == GameState.LOBBY) {
                 lobbyPane.update();
             } else if (gameState == GameState.GAME){
-                battleField.firstPlayer.move(0.016);
-                battleField.secondPlayer.move(0.016);
+                battleField.firstPlayer.move(REFRESH_TIME_MS / 1000);
+                battleField.secondPlayer.move(REFRESH_TIME_MS / 1000);
                 unfocus();
                 updateTimeLabel();
                 updatePlayer1Label();
