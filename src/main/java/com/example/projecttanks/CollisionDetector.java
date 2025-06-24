@@ -32,14 +32,13 @@ public class CollisionDetector {
         this.player2 = player2;
         this.walls = battleField.walls;
 
-        defineCorners();
-        if (isCornerColoringAllowed) drawWallsCorners();
+        definePlayerCorners();
+        defineWallsCorners();
     }
 
-    public void defineCorners() {
+    public void definePlayerCorners() {
         calculatePlayerCorners(player1, player1Corners);
         calculatePlayerCorners(player2, player2Corners);
-        calculateWallsCorners();
 
         rotatePlayerCorners(player1, player1Corners);
         rotatePlayerCorners(player2, player2Corners);
@@ -49,6 +48,11 @@ public class CollisionDetector {
             drawPlayerCorners(player1, player1Corners);
             drawPlayerCorners(player2, player2Corners);
         }
+    }
+
+    public void defineWallsCorners() {
+        calculateWallsCorners();
+        if (isCornerColoringAllowed) drawWallsCorners();
     }
 
     private void calculatePlayerCorners(Tank player, List<Vector2D> playerCorners) {
@@ -136,8 +140,8 @@ public class CollisionDetector {
         }
     }
 
-    public boolean isDetected(Tank player) {
-        defineCorners();
+    public boolean isDetectedForPlayer(Tank player) {
+        definePlayerCorners();
 
         List<Vector2D> playerCorners = player1Corners;
         if (player.player == Player.TWO) playerCorners = player2Corners;
@@ -159,6 +163,48 @@ public class CollisionDetector {
         }
         return false;
     }
+
+    public boolean isDetectedBulletHorizontal(Bullet bullet) {
+        double x = bullet.position.x;
+        double y = bullet.position.y;
+        double r = bullet.RADIUS;
+        for (Rectangle wall : walls) {
+            if (wall.contains(new Point2D(x + r, y)) ||
+                    wall.contains(new Point2D(x - r, y))) {
+                if (isCollisionColoringAllowed) colourWallCollidedWith(wall);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isDetectedBulletVertical(Bullet bullet) {
+        double x = bullet.position.x;
+        double y = bullet.position.y;
+        double r = bullet.RADIUS;
+        for (Rectangle wall : walls) {
+            if (wall.contains(new Point2D(x, y + r)) ||
+                    wall.contains(new Point2D(x, y - r))) {
+                if (isCollisionColoringAllowed) colourWallCollidedWith(wall);
+                return true;
+            }
+        }
+        return false;
+    }
+
+//    public boolean isDetectedBulletCorner(Bullet bullet) {
+//        double x = bullet.position.x;
+//        double y = bullet.position.y;
+//        double r = bullet.radius;
+//        for (Rectangle wall : walls) {
+//            if (wall.contains(new Point2D(x, y + r)) ||
+//                    wall.contains(new Point2D(x, y - r))) {
+//                if (isCollisionColoringAllowed) colourWallCollidedWith(wall);
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     private boolean checkCornerBounds(double cornerX, double cornerY, List<Vector2D> playerRawCorners, Tank player) {
         List<Vector2D> playerCorners = getAllGlobalPositions(playerRawCorners, player);

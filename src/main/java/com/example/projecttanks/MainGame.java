@@ -92,13 +92,11 @@ public class MainGame extends Application {
         borderPane.setCenter(battleField);
 
         borderPane.widthProperty().addListener((observableValue, previous, current) -> {
-            battleField.setCellSize();
             battleField.update();
             updateMargin();
         });
 
         borderPane.heightProperty().addListener((observableValue, previous, current) -> {
-            battleField.setCellSize();
             battleField.update();
             updateMargin();
         });
@@ -127,13 +125,12 @@ public class MainGame extends Application {
     }
 
     private Timeline getAnimation() {
-        Timeline animation = new Timeline(new KeyFrame(new Duration(20), e -> {
+        Timeline animation = new Timeline(new KeyFrame(new Duration(16), e -> {
             if (gameState == GameState.LOBBY) {
                 lobbyPane.update();
             } else if (gameState == GameState.GAME){
-                battleField.firstPlayer.move(0.02);
-                battleField.secondPlayer.move(0.02);
-                battleField.update();
+                battleField.firstPlayer.move(0.016);
+                battleField.secondPlayer.move(0.016);
                 unfocus();
                 updateTimeLabel();
                 updatePlayer1Label();

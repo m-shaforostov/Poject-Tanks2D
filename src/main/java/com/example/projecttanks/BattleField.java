@@ -80,6 +80,13 @@ public class BattleField extends Pane {
     }
 
     public void update() {
+        setCellSize();
+        updateCellSize();
+        updatePlayers();
+        if (collisionDetector != null) collisionDetector.defineWallsCorners();
+    }
+
+    private void updateCellSize() {
         for (int x = 0; x < fieldWidth; x++) {
             for (int y = 0; y < fieldHeight; y++) {
                 field[x][y].updateSize(cellSize);
@@ -232,6 +239,17 @@ public class BattleField extends Pane {
                     firstPlayer.position.y * coefficient);
             secondPlayer.setPosition(secondPlayer.position.x,
                     secondPlayer.position.y * coefficient);
+        }
+    }
+
+    public void updatePlayers() {
+        if (firstPlayer != null) {
+            firstPlayer.update();
+//            firstPlayer.updateBullets(0);
+        }
+        if (secondPlayer != null) {
+            secondPlayer.update();
+//            secondPlayer.updateBullets(0);
         }
     }
 }

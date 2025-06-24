@@ -20,7 +20,8 @@ public class Tank {
     Rotate rotation;
 
     private static double ROTATION_SPEED = 300; // angle per second
-    private static double speedLimit; // px per second
+    private double tankSpeedLimit; // px per second
+    private double bulletSpeed; // px per second
 
     private boolean isMoving = false;
     private boolean isRotatingL = false;
@@ -30,9 +31,13 @@ public class Tank {
     private Color color;
     private CollisionDetector collision;
 
-    private Integer bulletCount;
-    public Integer killCount;
-    public Integer deathCount;
+    private static int PROJECTILES_LIMIT = 5;
+    private int projectilesCount = PROJECTILES_LIMIT;
+    public List<Bullet> firedProjectiles = new ArrayList<>();
+
+    public int killCount;
+    public int deathCount;
+
     private List<Bonus> bonusesEarned = new ArrayList<>();
     public Bonus activeBonus = null;
 
@@ -82,13 +87,14 @@ public class Tank {
     public void move(double dt) {
         if (!isRotatingL && !isRotatingR) rotationSpeed = 0;
         angle = (angle + 360 + rotationSpeed * dt) % 360;
-        if (collision.isDetected(this))
+        if (collision.isDetectedForPlayer(this))
             angle = (angle + 360 - rotationSpeed * dt) % 360;
 
         if (!isMoving) speed = 0;
         velocity.setAngleAndLength(-Math.PI * angle / 180.0, speed);
         setNewPosition(dt);
         update();
+        updateBullets(dt);
     }
 
     private void setNewPosition(double dt) {
@@ -96,17 +102,19 @@ public class Tank {
         Vector2D currentPosition = new Vector2D(position.x, position.y);
 
         position = currentPosition.getAdded(ds);
-        if (!collision.isDetected(this)) return;
+        if (!collision.isDetectedForPlayer(this)) return;
         position = currentPosition.getAdded(new Vector2D(ds.x, 0));
-        if (!collision.isDetected(this)) return;
+        if (!collision.isDetectedForPlayer(this)) return;
         position = currentPosition.getAdded(new Vector2D(0, ds.y));
-        if (!collision.isDetected(this)) return;
+        if (!collision.isDetectedForPlayer(this)) return;
         position = currentPosition;
-        if (collision.isDetected(this)) System.out.println("PROBLEM!!");
+        // TODO
+        if (collision.isDetectedForPlayer(this)) System.out.println("PROBLEM!!");
     }
 
     public void update(){
-        speedLimit = battleField.cellSize * 1.7; // cells per second
+        tankSpeedLimit = battleField.cellSize * 1.7; // cells per second
+        bulletSpeed = tankSpeedLimit;
         updateSize();
         updateRotation();
 
@@ -134,17 +142,13 @@ public class Tank {
         turret.setStrokeWidth(1);
     }
 
-    private boolean checkBounds(Vector2D newPos) {
-        return newPos.x >= 0 && newPos.x < battleField.getPrefWidth() && newPos.y >= 0 && newPos.y < battleField.getPrefHeight();
-    }
-
     public void startMovementForward(){
-        speed = speedLimit;
+        speed = tankSpeedLimit;
         isMoving = true;
     }
 
     public void startMovementBackwards() {
-        speed = -speedLimit;
+        speed = -tankSpeedLimit;
         isMoving = true;
     }
 
@@ -172,6 +176,15 @@ public class Tank {
     }
 
     public void shoot() {
+        Vector2D velocity = new Vector2D();
+        velocity.setAngleAndLength(-Math.PI * angle / 180.0, bulletSpeed);
+        firedProjectiles.add(new Bullet(position, velocity, battleField));
+    }
+
+    private void updateBullets(double dt) {
+        for (Projectile projectile : firedProjectiles) {
+            projectile.update(dt);
+        }
     }
 
 }
