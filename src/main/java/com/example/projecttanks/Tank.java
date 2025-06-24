@@ -33,7 +33,8 @@ public class Tank {
 
     private static int PROJECTILES_LIMIT = 5;
     private int projectilesCount = PROJECTILES_LIMIT;
-    public List<Bullet> firedProjectiles = new ArrayList<>();
+    public List<Projectile> firedProjectiles = new ArrayList<>();
+    public List<Projectile> projectilesToRemove = new ArrayList<>();
 
     public int killCount;
     public int deathCount;
@@ -176,15 +177,26 @@ public class Tank {
     }
 
     public void shoot() {
+        if (projectilesCount == 0) return;
         Vector2D velocity = new Vector2D();
         velocity.setAngleAndLength(-Math.PI * angle / 180.0, bulletSpeed);
-        firedProjectiles.add(new Bullet(position, velocity, battleField));
+        firedProjectiles.add(new Bullet(position, velocity, this, battleField));
+        projectilesCount--;
+    }
+
+    public void removeProjectile(Projectile projectile) {
+        projectilesToRemove.add(projectile);
+        projectilesCount++;
     }
 
     private void updateBullets(double dt) {
         for (Projectile projectile : firedProjectiles) {
             projectile.update(dt);
         }
+        for (Projectile projectile : projectilesToRemove) {
+            firedProjectiles.remove(projectile);
+        }
+        projectilesToRemove.clear();
     }
 
 }
