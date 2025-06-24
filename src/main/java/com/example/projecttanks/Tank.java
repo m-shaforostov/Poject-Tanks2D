@@ -37,9 +37,6 @@ public class Tank {
     public List<Projectile> firedProjectiles = new ArrayList<>();
     public List<Projectile> projectilesToRemove = new ArrayList<>();
 
-    private List<Bonus> bonusesEarned = new ArrayList<>();
-    public Bonus activeBonus = null;
-
     Rectangle base = new Rectangle();
     Circle turret = new Circle();
     Rectangle muzzle = new Rectangle();

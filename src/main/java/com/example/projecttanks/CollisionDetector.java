@@ -244,8 +244,4 @@ public class CollisionDetector {
         detectedCorner.setRadius(3);
         detectedCorner.setFill(Color.GREEN);
     }
-
-    public void updateCornersWhenResizing(){
-
-    }
 }
