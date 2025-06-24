@@ -8,6 +8,8 @@ public abstract class Projectile {
     public BattleField battleField;
     public CollisionDetector collision;
 
+    public boolean isDestroyed = false;
+
     Projectile(Vector2D position, Vector2D velocity, Tank player, BattleField battleField) {
         this.position = position;
         this.velocity = velocity;

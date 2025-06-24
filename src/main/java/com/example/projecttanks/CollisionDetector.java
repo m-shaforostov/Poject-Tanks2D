@@ -156,7 +156,7 @@ public class CollisionDetector {
             }
         }
         for (Vector2D wallCorner : wallsCorners) {
-            if (checkCornerBounds(wallCorner.x, wallCorner.y, playerCorners, player)) {
+            if (checkCircleIntersection(wallCorner.x, wallCorner.y, 0, playerCorners, player)) {
                 if (isCollisionColoringAllowed) colourCornerCollidedWith(wallCorner);
                 return true;
             }
@@ -192,21 +192,17 @@ public class CollisionDetector {
         return false;
     }
 
-//    public boolean isDetectedBulletWithPlayer(Bullet bullet, Tank player) {
-//        definePlayerCorners();
-//
-//        List<Vector2D> playerCorners = player1Corners;
-//        if (player.player == Player.TWO) playerCorners = player2Corners;
-//        if (checkCornerBounds(bullet.getX(), bullet.getY(), playerCorners, player)) {
-//            if (isCollisionColoringAllowed) colourCornerCollidedWith(wallCorner);
-//            return true;
-//        }
-//        return false;
-//    }
+    public boolean isDetectedBulletWithPlayer(Bullet bullet, Tank player) {
+        definePlayerCorners();
+        List<Vector2D> playerCorners = player1Corners;
+        if (player.player == Player.TWO) playerCorners = player2Corners;
 
-    private boolean checkCornerBounds(double cornerX, double cornerY, List<Vector2D> playerRawCorners, Tank player) {
+        return checkCircleIntersection(bullet.getX(), bullet.getY(), bullet.radius, playerCorners, player);
+    }
+
+    private boolean checkCircleIntersection(double circleX, double circleY, double radius, List<Vector2D> playerRawCorners, Tank player) {
         List<Vector2D> playerCorners = getAllGlobalPositions(playerRawCorners, player);
-        PointsProjection projection = new PointsProjection (cornerX, cornerY, playerCorners, player.angle);
+        PointsProjection projection = new PointsProjection(circleX, circleY, radius, playerCorners, player.angle);
         return projection.isWithinBoundsX() && projection.isWithinBoundsY();
     }
 
