@@ -20,8 +20,8 @@ public class Tank {
     Rotate rotation;
 
     private static double ROTATION_SPEED = 300; // angle per second
-    private double tankSpeedLimit; // px per second
-    private double bulletSpeed; // px per second
+    public double tankSpeedLimit; // px per second
+    public double bulletSpeedLimit; // px per second
 
     private boolean isMoving = false;
     private boolean isRotatingL = false;
@@ -45,6 +45,7 @@ public class Tank {
     Rectangle base = new Rectangle();
     Circle turret = new Circle();
     Rectangle muzzle = new Rectangle();
+    double muzzleLengthCoefficient;
 
     BattleField battleField;
 
@@ -66,13 +67,23 @@ public class Tank {
         turret.getTransforms().add(rotation);
     }
 
+    public void redrawTankElements() {
+        battleField.getChildren().remove(base);
+        battleField.getChildren().remove(muzzle);
+        battleField.getChildren().remove(turret);
+
+        battleField.getChildren().add(base);
+        battleField.getChildren().add(muzzle);
+        battleField.getChildren().add(turret);
+    }
+
     public void setCollisionDetector(CollisionDetector collisionDetector) {
         this.collision = collisionDetector;
     }
 
     public void updateSize() {
         this.width = battleField.cellSize * 0.3;
-        this.length = battleField.cellSize * 0.5;
+        this.length = battleField.cellSize * 0.4;
     }
 
     public void setPosition(double x, double y) {
@@ -115,7 +126,7 @@ public class Tank {
 
     public void update(){
         tankSpeedLimit = battleField.cellSize * 1.7; // cells per second
-        bulletSpeed = tankSpeedLimit;
+        bulletSpeedLimit = tankSpeedLimit * 1.2;
         updateSize();
         updateRotation();
 
@@ -127,7 +138,8 @@ public class Tank {
         base.setStroke(Color.BLACK);
         base.setStrokeWidth(1);
 
-        muzzle.setWidth(length * 0.5);
+        muzzleLengthCoefficient = 0.5;
+        muzzle.setWidth(length * muzzleLengthCoefficient);
         muzzle.setHeight(width * 0.2);
         muzzle.setX(position.x);
         muzzle.setY(position.y - muzzle.getHeight() / 2);
@@ -137,7 +149,7 @@ public class Tank {
 
         turret.setCenterX(position.x);
         turret.setCenterY(position.y);
-        turret.setRadius(width * 0.4);
+        turret.setRadius(width * 0.3);
         turret.setFill(color);
         turret.setStroke(Color.BLACK);
         turret.setStrokeWidth(1);
@@ -178,9 +190,12 @@ public class Tank {
 
     public void shoot() {
         if (projectilesCount == 0) return;
+        Vector2D deltaPosition = new Vector2D();
+        deltaPosition.setAngleAndLength(-Math.PI * angle / 180.0, length * muzzleLengthCoefficient);
+
         Vector2D velocity = new Vector2D();
-        velocity.setAngleAndLength(-Math.PI * angle / 180.0, bulletSpeed);
-        firedProjectiles.add(new Bullet(position, velocity, this, battleField));
+        velocity.setAngleAndLength(-Math.PI * angle / 180.0, bulletSpeedLimit);
+        firedProjectiles.add(new Bullet(position.getAdded(deltaPosition), velocity, this, battleField));
         projectilesCount--;
     }
 
@@ -199,4 +214,10 @@ public class Tank {
         projectilesToRemove.clear();
     }
 
+    public void updateBulletsSize() {
+        for (Projectile projectile : firedProjectiles) {
+            projectile.updateSize();
+            projectile.updateSpeed();
+        }
+    }
 }

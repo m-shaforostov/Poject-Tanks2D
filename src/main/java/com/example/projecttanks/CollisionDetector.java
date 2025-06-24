@@ -192,16 +192,14 @@ public class CollisionDetector {
         return false;
     }
 
-//    public boolean isDetectedBulletCorner(Bullet bullet) {
-//        double x = bullet.position.x;
-//        double y = bullet.position.y;
-//        double r = bullet.radius;
-//        for (Rectangle wall : walls) {
-//            if (wall.contains(new Point2D(x, y + r)) ||
-//                    wall.contains(new Point2D(x, y - r))) {
-//                if (isCollisionColoringAllowed) colourWallCollidedWith(wall);
-//                return true;
-//            }
+//    public boolean isDetectedBulletWithPlayer(Bullet bullet, Tank player) {
+//        definePlayerCorners();
+//
+//        List<Vector2D> playerCorners = player1Corners;
+//        if (player.player == Player.TWO) playerCorners = player2Corners;
+//        if (checkCornerBounds(bullet.getX(), bullet.getY(), playerCorners, player)) {
+//            if (isCollisionColoringAllowed) colourCornerCollidedWith(wallCorner);
+//            return true;
 //        }
 //        return false;
 //    }

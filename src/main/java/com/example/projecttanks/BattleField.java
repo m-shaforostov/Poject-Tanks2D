@@ -42,8 +42,8 @@ public class BattleField extends Pane {
         firstPlayer.update();
         secondPlayer.update();
 
-        getChildren().addAll(firstPlayer.base, firstPlayer.muzzle, firstPlayer.turret);
-        getChildren().addAll(secondPlayer.base, secondPlayer.muzzle, secondPlayer.turret);
+        firstPlayer.redrawTankElements();
+        secondPlayer.redrawTankElements();
 
         collisionDetector = new CollisionDetector(this, firstPlayer, secondPlayer);
         firstPlayer.setCollisionDetector(collisionDetector);
@@ -71,7 +71,6 @@ public class BattleField extends Pane {
                 break;
             }
         }
-
     }
 
     public void draw(){
@@ -114,7 +113,7 @@ public class BattleField extends Pane {
         if (battleFieldRatio > centralPaneRatio) {
             cellSize = centralPaneWidth / fieldWidth;
 
-            updateResizedPlayersX(getPrefWidth(), centralPaneWidth);
+            updateResizedItemsX(getPrefWidth(), centralPaneWidth);
             setPrefWidth(centralPaneWidth);
 
             updateResizedPlayersY(getPrefHeight(), fieldHeight * cellSize);
@@ -122,7 +121,7 @@ public class BattleField extends Pane {
         } else {
             cellSize = centralPaneHeight / fieldHeight;
 
-            updateResizedPlayersX(getPrefWidth(), fieldWidth * cellSize);
+            updateResizedItemsX(getPrefWidth(), fieldWidth * cellSize);
             setPrefWidth(fieldWidth * cellSize);
 
             updateResizedPlayersY(getPrefHeight(), centralPaneHeight);
@@ -247,34 +246,36 @@ public class BattleField extends Pane {
         initPlayers();
     }
 
-    public void updateResizedPlayersX(Number prev, Number curr) {
-        if (firstPlayer != null && secondPlayer != null) {
-            double coefficient = curr.doubleValue() / prev.doubleValue();
-            firstPlayer.setPosition(firstPlayer.position.x * coefficient,
-                    firstPlayer.position.y);
-            secondPlayer.setPosition(secondPlayer.position.x * coefficient,
-                    secondPlayer.position.y);
-        }
+    public void updateResizedItemsX(Number prev, Number curr) {
+        double coefficient = curr.doubleValue() / prev.doubleValue();
+        updateResizedPlayerAndBullets(firstPlayer, coefficient, 1);
+        updateResizedPlayerAndBullets(secondPlayer, coefficient, 1);
+
     }
 
     public void updateResizedPlayersY(Number prev, Number curr) {
-        if (firstPlayer != null && secondPlayer != null) {
-            double coefficient = curr.doubleValue() / prev.doubleValue();
-            firstPlayer.setPosition(firstPlayer.position.x,
-                    firstPlayer.position.y * coefficient);
-            secondPlayer.setPosition(secondPlayer.position.x,
-                    secondPlayer.position.y * coefficient);
+        double coefficient = curr.doubleValue() / prev.doubleValue();
+        updateResizedPlayerAndBullets(firstPlayer, 1, coefficient);
+        updateResizedPlayerAndBullets(secondPlayer, 1, coefficient);
+    }
+
+    private void updateResizedPlayerAndBullets(Tank player, double coefX, double coefY) {
+        if (player != null){
+            player.setPosition(player.position.x * coefX, player.position.y * coefY);
+            for (Projectile projectile : player.firedProjectiles){
+                projectile.setPosition(projectile.getX() * coefX, projectile.getY() * coefY);
+            }
         }
     }
 
     public void updatePlayers() {
         if (firstPlayer != null) {
             firstPlayer.update();
-//            firstPlayer.updateBullets(0);
+            firstPlayer.updateBulletsSize();
         }
         if (secondPlayer != null) {
             secondPlayer.update();
-//            secondPlayer.updateBullets(0);
+            secondPlayer.updateBulletsSize();
         }
     }
 }
