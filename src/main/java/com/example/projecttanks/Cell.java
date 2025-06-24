@@ -13,6 +13,7 @@ public class Cell {
     public double size = 0;
 
     public boolean isVisited = false;
+    public boolean isClosed = false;
 
     public boolean wallTop = true;
     public boolean wallBottom = true;

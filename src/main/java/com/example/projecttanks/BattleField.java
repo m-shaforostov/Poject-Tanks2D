@@ -16,6 +16,9 @@ public class BattleField extends Pane {
     public int fieldHeight;
     public double cellSize;
 
+    private static final int closedCellRate = 30;
+    Random rand = new Random();
+
     public List<Tank> tanks = new ArrayList<Tank>();
     public Tank firstPlayer;
     public Tank secondPlayer;
@@ -52,15 +55,23 @@ public class BattleField extends Pane {
         int spawnAreaWidth = fieldWidth / 2;
         int spawnAreaHeight = fieldHeight / 2;
 
-        Random rand = new Random();
-        double firstPlayerX = rand.nextInt(spawnAreaWidth);
-        double firstPlayerY = rand.nextInt(spawnAreaHeight);
+        while (true){
+            int firstPlayerX = rand.nextInt(spawnAreaWidth);
+            int firstPlayerY = rand.nextInt(spawnAreaHeight);
+            if (!field[firstPlayerX][firstPlayerY].isClosed) {
+                firstPlayer.setPosition((firstPlayerX + 0.5) * cellSize, (firstPlayerY + 0.5) * cellSize);
+                break;
+            }
+        }
+        while (true){
+            int secondPlayerX = fieldWidth - rand.nextInt(spawnAreaWidth);
+            int secondPlayerY = fieldHeight - rand.nextInt(spawnAreaHeight);
+            if (!field[secondPlayerX - 1][secondPlayerY - 1].isClosed) {
+                secondPlayer.setPosition((secondPlayerX - 0.5) * cellSize, (secondPlayerY - 0.5) * cellSize);
+                break;
+            }
+        }
 
-        double secondPlayerX = fieldWidth - rand.nextInt(spawnAreaWidth);
-        double secondPlayerY = fieldHeight - rand.nextInt(spawnAreaHeight);
-
-        firstPlayer.setPosition((firstPlayerX + 0.5) * cellSize, (firstPlayerY + 0.5) * cellSize);
-        secondPlayer.setPosition((secondPlayerX - 0.5) * cellSize, (secondPlayerY - 0.5) * cellSize);
     }
 
     public void draw(){
@@ -167,8 +178,21 @@ public class BattleField extends Pane {
     }
 
     private void generateMaze() {
+        generateClosedCells();
         Cell start = getStartCell();
         backTrack(null, start);
+    }
+
+    private void generateClosedCells() {
+        for (int x = 0; x < fieldWidth; x++) {
+            for (int y = 0; y < fieldHeight; y++) {
+                if (rand.nextInt(closedCellRate) == 0) {
+                    field[x][y].isVisited = true;
+                    field[x][y].isClosed = true;
+                    System.out.println("Closed: " + x + ", " + y);
+                }
+            }
+        }
     }
 
     private void backTrack(Cell previous, Cell current) {
@@ -204,7 +228,8 @@ public class BattleField extends Pane {
         Random rand = new Random();
         int x = rand.nextInt(fieldWidth);
         int y = rand.nextInt(fieldHeight);
-        return field[x][y];
+        if (!field[x][y].isClosed) return field[x][y];
+        return getStartCell();
     }
 
     public void resetCells() {
