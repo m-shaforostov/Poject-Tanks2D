@@ -7,6 +7,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class CollisionDetector {
     BattleField battleField;
@@ -144,7 +145,13 @@ public class CollisionDetector {
         definePlayerCorners();
 
         List<Vector2D> playerCorners = player1Corners;
-        if (player.player == Player.TWO) playerCorners = player2Corners;
+        List<Vector2D> enemyCorners = player2Corners;
+        Tank enemy = battleField.secondPlayer;
+        if (player.player == Player.TWO) {
+            playerCorners = player2Corners;
+            enemyCorners = player1Corners;
+            enemy = battleField.firstPlayer;
+        }
 
         for (Rectangle wall : walls) {
             for (Vector2D playerCorner : playerCorners) {
@@ -158,6 +165,20 @@ public class CollisionDetector {
         for (Vector2D wallCorner : wallsCorners) {
             if (checkCircleIntersection(wallCorner.x, wallCorner.y, 0, playerCorners, player)) {
                 if (isCollisionColoringAllowed) colourCornerCollidedWith(wallCorner);
+                return true;
+            }
+        }
+
+        for (Vector2D corner : enemyCorners) {
+            Vector2D globalPosition = getPlayerCornerGlobalPosition(corner, enemy);
+            if (checkCircleIntersection(globalPosition.x, globalPosition.y, 0, playerCorners, player)) {
+                return true;
+            }
+        }
+
+        for (Vector2D corner : playerCorners) {
+            Vector2D globalPosition = getPlayerCornerGlobalPosition(corner, player);
+            if (checkCircleIntersection(globalPosition.x, globalPosition.y, 0, enemyCorners, enemy)) {
                 return true;
             }
         }
