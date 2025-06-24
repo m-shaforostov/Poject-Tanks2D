@@ -81,6 +81,7 @@ public class BattleField extends Pane {
     public void draw(){
         getChildren().clear();
         walls.clear();
+        drawBackground();
         for (int x = 0; x < fieldWidth; x++) {
             for (int y = 0; y < fieldHeight; y++) {
                 boolean drawBorderWalls = (x == fieldWidth - 1 || y == fieldHeight - 1);
@@ -92,6 +93,14 @@ public class BattleField extends Pane {
             }
         }
         getChildren().addAll(walls); // draw the walls
+    }
+
+    private void drawBackground() {
+        Rectangle background = new Rectangle(0, 0, getWidth(), getHeight());
+        background.setFill(Cell.BG_COLOR);
+        background.widthProperty().bind(widthProperty());
+        background.heightProperty().bind(heightProperty());
+        getChildren().add(background);
     }
 
     public void update() {

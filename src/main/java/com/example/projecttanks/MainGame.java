@@ -206,7 +206,6 @@ public class MainGame extends Application {
         else if (btn == newRound) {
             battleField.gameState.evaluateRound();
             if (appState == AppState.END) return;
-            battleField.getChildren().clear();
             startNewRound();
             unfocus();
         }

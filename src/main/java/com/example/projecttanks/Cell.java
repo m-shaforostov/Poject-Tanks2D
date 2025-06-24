@@ -28,7 +28,7 @@ public class Cell {
     public Rectangle[] walls;
     public Rectangle cell;
 
-    private Color BG_COLOR = Color.WHITE;
+    public static Color BG_COLOR = Color.LIGHTGRAY;
     private Color WALL_COLOR = Color.BLACK;
     private double wallNarrowSide = 0.1;
     private double wallWideSide = 1.1;
@@ -50,6 +50,7 @@ public class Cell {
 
     public void reset(){
         isVisited = false;
+        isClosed = false;
         wallTop = true;
         wallBottom = true;
         wallLeft = true;
@@ -133,9 +134,10 @@ public class Cell {
     public void updateCell() {
         cell.setWidth(size);
         cell.setHeight(size);
-        cell.setFill(BG_COLOR);
         cell.setX(position.x);
         cell.setY(position.y);
+        if (isClosed) cell.setFill(Color.WHITE);
+        else cell.setFill(BG_COLOR);
     }
 
     private void updateWalls() {
