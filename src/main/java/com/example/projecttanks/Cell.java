@@ -16,14 +16,10 @@ public class Cell {
     private Vector2D position; // pixels
     private double size = 0;
 
-    /**
-     * Tells whether the cell was visited while the process of maze generation (backtracking) or not
-     */
+    /** Tells whether the cell was visited while the process of maze generation (backtracking) or not */
     public boolean isVisited = false;
 
-    /**
-     * Tells whether the cell is chosen to be closed (won't be connected to other cells)
-     */
+    /** Tells whether the cell is chosen to be closed (won't be connected to other cells) */
     public boolean isClosed = false;
 
     private boolean wallTop = true;
@@ -38,9 +34,7 @@ public class Cell {
 
     private Rectangle cell;
 
-    /**
-     * Background color of the cell
-     */
+    /** Background color of the cell */
     public static Color BG_COLOR = Color.LIGHTGRAY;
     private static final Color WALL_COLOR = Color.BLACK;
     private final double wallNarrowSide = 0.1;

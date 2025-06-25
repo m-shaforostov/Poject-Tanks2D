@@ -26,10 +26,7 @@ public class Tank {
     private static final double ROTATION_SPEED = 300; // angle per second
     private double tankSpeedLimit; // px per second
 
-    /**
-     * Linear speed of the bullet.
-     * Is calculated based on the speed of tank
-     */
+    /** Linear speed of the bullet. It is calculated based on the speed of tank */
     public double bulletSpeedLimit; // px per second
 
     private boolean isMoving = false;
