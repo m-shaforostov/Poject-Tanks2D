@@ -29,16 +29,16 @@ public class GameState {
     }
 
     public void murdered(Tank murderer, Tank victim) {
-        if (victim.player == Player.ONE){
+        if (victim.getPlayer() == Player.ONE){
             isDead1 = true;
             deathCount1++;
-            if (murderer.player != victim.player){
+            if (murderer.getPlayer() != victim.getPlayer()){
                 killCount2++;
             }
-        } else if (victim.player == Player.TWO){
+        } else if (victim.getPlayer() == Player.TWO){
             isDead2 = true;
             deathCount2++;
-            if (murderer.player != victim.player){
+            if (murderer.getPlayer() != victim.getPlayer()){
                 killCount1++;
             }
         }

@@ -73,8 +73,8 @@ public class BattleField extends Pane {
         firstPlayer.update();
         secondPlayer.update();
 
-        firstPlayer.redrawTankElements();
-        secondPlayer.redrawTankElements();
+        firstPlayer.drawTankElements();
+        secondPlayer.drawTankElements();
 
         collisionDetector = new CollisionDetector(this, firstPlayer, secondPlayer);
         firstPlayer.setCollisionDetector(collisionDetector);
@@ -306,8 +306,8 @@ public class BattleField extends Pane {
 
     private void updateResizedPlayerAndBullets(Tank player, double coefX, double coefY) {
         if (player != null){
-            player.setPosition(player.position.x * coefX, player.position.y * coefY);
-            for (Projectile projectile : player.firedProjectiles){
+            player.setPosition(player.getX() * coefX, player.getY() * coefY);
+            for (Projectile projectile : player.getFiredProjectiles()){
                 projectile.setPosition(projectile.getX() * coefX, projectile.getY() * coefY);
             }
         }
@@ -326,11 +326,11 @@ public class BattleField extends Pane {
     private void updatePlayers() {
         if (firstPlayer != null) {
             firstPlayer.update();
-            firstPlayer.updateBulletsSize();
+            firstPlayer.updateProjectileResizing();
         }
         if (secondPlayer != null) {
             secondPlayer.update();
-            secondPlayer.updateBulletsSize();
+            secondPlayer.updateProjectileResizing();
         }
     }
 

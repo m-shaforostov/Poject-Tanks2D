@@ -19,7 +19,7 @@ public class Bullet extends Projectile {
         super(position, velocity, player, battleField);
         updateSize();
         draw();
-        player.redrawTankElements();
+        player.drawTankElements();
     }
 
     @Override
@@ -31,7 +31,7 @@ public class Bullet extends Projectile {
 
     @Override
     public void updateSize() {
-        radius = player.width * 0.1;
+        radius = player.getWidth() * 0.1;
         bulletCircle.setRadius(radius);
         disappearanceStep = radius * MainGame.REFRESH_TIME_MS / (disappearanceTime * 1000);
     }

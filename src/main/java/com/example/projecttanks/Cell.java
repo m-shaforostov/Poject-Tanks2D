@@ -119,6 +119,13 @@ public class Cell {
     }
 
     /**
+     * Sets variable value to true, saying that this cell was visited while maze generation process (backtracking)
+     */
+    public void setVisited() {
+        isVisited = true;
+    }
+
+    /**
      * Initializes all elements of the cell (background cell and walls' rectangles).
      * Doesn't draw bottom and right walls if the cell is located far from the broad.
      * If the cell is located close to the broad it shows bottom and right walls to constract the border
@@ -203,12 +210,5 @@ public class Cell {
         updateWallBottom(x, y);
         updateWallLeft(x, y);
         updateWallRight(x, y);
-    }
-
-    /**
-     * Sets variable value to true, saying that this cell was visited while maze generation process (backtracking)
-     */
-    public void setVisited() {
-        isVisited = true;
     }
 }

@@ -361,10 +361,10 @@ public class MainGame extends Application {
                 lobbyPane.update();
             } else if (getAppState() == AppState.GAME){
                 battleField.firstPlayer.move(REFRESH_TIME_MS / 1000);
-                battleField.firstPlayer.updateBullets(REFRESH_TIME_MS / 1000);
+                battleField.firstPlayer.updateProjectile(REFRESH_TIME_MS / 1000);
 
                 battleField.secondPlayer.move(REFRESH_TIME_MS / 1000);
-                battleField.secondPlayer.updateBullets(REFRESH_TIME_MS / 1000);
+                battleField.secondPlayer.updateProjectile(REFRESH_TIME_MS / 1000);
 
                 updateLabels();
             } else if (getAppState() == AppState.END){

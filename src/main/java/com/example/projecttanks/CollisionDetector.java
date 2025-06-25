@@ -58,9 +58,9 @@ public class CollisionDetector {
 
     private void calculatePlayerCorners(Tank player, List<Vector2D> playerCorners) {
         playerCorners.clear();
-        Vector2D position = player.position;
-        double width = player.length;
-        double height = player.width;
+        Vector2D position = player.getPosition();
+        double width = player.getLength();
+        double height = player.getWidth();
         Vector2D defaultLeftTopCorner = new Vector2D(position.x - width / 2, position.y - height / 2);
         Vector2D defaultLeftBottomCorner = new Vector2D(position.x - width / 2, position.y + height / 2);
         Vector2D defaultRightTopCorner = new Vector2D(position.x + width / 2, position.y - height / 2);
@@ -72,7 +72,7 @@ public class CollisionDetector {
     }
 
     private void rotatePlayerCorners(Tank player, List<Vector2D> playerCorners) {
-        double angle = player.angle;
+        double angle = player.getAngle();
         for (Vector2D playerCorner : playerCorners) {
             double defaultAngle = playerCorner.getAngle();
             playerCorner.setAngleAndLength(defaultAngle - Math.PI * angle / 180.0, playerCorner.getLength());
@@ -80,7 +80,7 @@ public class CollisionDetector {
     }
 
     private Vector2D getPlayerCornerGlobalPosition(Vector2D playerRawCorner, Tank player) {
-        return playerRawCorner.getAdded(player.position);
+        return playerRawCorner.getAdded(player.getPosition());
     }
 
     private List<Vector2D> getAllGlobalPositions(List<Vector2D> playerRawCorners, Tank player) {
@@ -147,7 +147,7 @@ public class CollisionDetector {
         List<Vector2D> playerCorners = player1Corners;
         List<Vector2D> enemyCorners = player2Corners;
         Tank enemy = battleField.secondPlayer;
-        if (player.player == Player.TWO) {
+        if (player.getPlayer() == Player.TWO) {
             playerCorners = player2Corners;
             enemyCorners = player1Corners;
             enemy = battleField.firstPlayer;
@@ -216,14 +216,14 @@ public class CollisionDetector {
     public boolean isDetectedBulletWithPlayer(Bullet bullet, Tank player) {
         definePlayerCorners();
         List<Vector2D> playerCorners = player1Corners;
-        if (player.player == Player.TWO) playerCorners = player2Corners;
+        if (player.getPlayer() == Player.TWO) playerCorners = player2Corners;
 
         return checkCircleIntersection(bullet.getX(), bullet.getY(), bullet.radius, playerCorners, player);
     }
 
     private boolean checkCircleIntersection(double circleX, double circleY, double radius, List<Vector2D> playerRawCorners, Tank player) {
         List<Vector2D> playerCorners = getAllGlobalPositions(playerRawCorners, player);
-        PointsProjection projection = new PointsProjection(circleX, circleY, radius, playerCorners, player.angle);
+        PointsProjection projection = new PointsProjection(circleX, circleY, radius, playerCorners, player.getAngle());
         return projection.isWithinBoundsX() && projection.isWithinBoundsY();
     }
 
