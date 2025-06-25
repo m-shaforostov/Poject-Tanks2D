@@ -1,5 +1,11 @@
 package com.example.projecttanks;
 
+/**
+ * Represents two players in the game
+ */
 public enum Player {
-    ONE, TWO
+    /** first player */
+    ONE,
+    /** second player */
+    TWO
 }

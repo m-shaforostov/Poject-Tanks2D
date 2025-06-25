@@ -1,33 +1,51 @@
 package com.example.projecttanks;
 
+/**
+ * Manages the game state, including round progression, player statistics and win conditions for the game.
+ */
 public class GameState {
-    MainGame game;
+    private final MainGame game;
 
-    public static final int ROUNDS_TO_WIN = 2;
-    public static final int LAST_SECONDS_TO_LIVE = 3;
-    public static final int LAST_SECONDS_FOR_INFO = 2;
+    /** Represents number of rounds a tank has tow win to win the whole game */
+    public static final int ROUNDS_TO_WIN = 5;
+    private static final int LAST_SECONDS_TO_LIVE = 3;
+    private static final int LAST_SECONDS_FOR_INFO = 2;
 
-    public int currentRound = 1;
-    public int roundsPlayed = 0;
+    /** Indicates whether the current round has ended */
     public boolean isRoundOver = false;
-    public int countDown;
+    /** Indicates whether the current gane has ended */
     public boolean isGameOver = false;
-    public Player winner;
+    /** Countdown timer. While this time alive tank must survive to win. */
+    public int countDown;
 
+    private Player winner;
+
+    /** Shows number of rounds the first player has won */
     public int roundsWon1 = 0;
-    public int killCount1 = 0;
-    public int deathCount1 = 0;
-    public boolean isDead1 = false;
+    private int killCount1 = 0;
+    private int deathCount1 = 0;
+    private boolean isDead1 = false;
 
+    /** Shows number of rounds the second player has won */
     public int roundsWon2 = 0;
-    public int killCount2 = 0;
-    public int deathCount2 = 0;
-    public boolean isDead2 = false;
+    private int killCount2 = 0;
+    private int deathCount2 = 0;
+    private boolean isDead2 = false;
 
+    /**
+     * Constructs a GameState controller for a given game.
+     * @param game the {@link MainGame} instance.
+     */
     GameState(MainGame game) {
         this.game = game;
     }
 
+    /**
+     * Manages a murder of a tank for given murderer and victim.
+     * Updates kill counts and determines whether and when the round should end.
+     * @param murderer the tank that killed
+     * @param victim the tank that was killed
+     */
     public void murdered(Tank murderer, Tank victim) {
         if (victim.getPlayer() == Player.ONE){
             isDead1 = true;
@@ -42,6 +60,7 @@ public class GameState {
                 killCount1++;
             }
         }
+
         if (!isDead1 || !isDead2) oneLeft();
         else noOneLeft();
     }
@@ -56,6 +75,10 @@ public class GameState {
         countDown = LAST_SECONDS_FOR_INFO;
     }
 
+    /**
+     * Determines the winner of the round and checks if the game is over.
+     * If the game ends, notifies the game for winner display.
+     */
     public void evaluateRound() {
         if (!isDead1 || !isDead2){
             if (isDead1) roundsWon2++;
@@ -78,19 +101,17 @@ public class GameState {
         isDead1 = false;
         isDead2 = false;
         isRoundOver = false;
-        roundsPlayed++;
-        currentRound++;
     }
 
-    public void newRound(){
-        game.btnAction("New round");
-    }
-
+    /**
+     * Decrements count down to round ending.
+     * When the count reaches zero point, evaluates the round and starts new one if the game is not over.
+     */
     public void decrementCountDown() {
         countDown--;
         if (countDown <= 0) {
             evaluateRound();
-            if (!isGameOver) newRound();
+            if (!isGameOver) game.btnAction("New round");
         }
     }
 }
