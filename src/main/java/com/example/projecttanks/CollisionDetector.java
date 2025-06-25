@@ -7,26 +7,36 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
+/**
+ * Handles all collision detection logic int the game.
+ * It detects collision of each tank with other tanks, bullets and walls.
+ * And can optionally visualise collision zones and points (wall or corner the tank or the bullet collided with).
+ */
 public class CollisionDetector {
-    BattleField battleField;
-    Tank player1, player2;
-    List<Rectangle> walls;
+    private final BattleField battleField;
+    private final Tank player1, player2;
+    private final List<Rectangle> walls;
 
-    List<Vector2D> player1Corners = new ArrayList<>();
-    List<Vector2D> player2Corners = new ArrayList<>();
-    List<Vector2D> wallsCorners = new ArrayList<>();
+    private final List<Vector2D> player1Corners = new ArrayList<>();
+    private final List<Vector2D> player2Corners = new ArrayList<>();
+    private final List<Vector2D> wallsCorners = new ArrayList<>();
 
-    List<Circle> allPlayersCorners = new ArrayList<>();
-    List<Circle> allWallsCorners = new ArrayList<>();
+    private final List<Circle> allPlayersCorners = new ArrayList<>();
+    private final List<Circle> allWallsCorners = new ArrayList<>();
 
-    Rectangle detectedWall = new Rectangle();
-    Circle detectedCorner = new Circle();
+    private final Rectangle detectedWall = new Rectangle();
+    private final Circle detectedCorner = new Circle();
 
-    boolean isCollisionColoringAllowed = false;
-    boolean isCornerColoringAllowed = false;
+    private final static boolean IS_COLLISION_COLORING_ALLOWED = false;
+    private final static boolean IS_CORNER_COLORING_ALLOWED = false;
 
+    /**
+     * Constructs the collision detector for two tanks and a battlefield
+     * @param battleField the battlefield where the detection will take place
+     * @param player1 the first player (tank)
+     * @param player2 the second player (tank)
+     */
     CollisionDetector(BattleField battleField, Tank player1, Tank player2) {
         this.battleField = battleField;
         this.player1 = player1;
@@ -37,23 +47,23 @@ public class CollisionDetector {
         defineWallsCorners();
     }
 
-    public void definePlayerCorners() {
+    private void definePlayerCorners() {
         calculatePlayerCorners(player1, player1Corners);
         calculatePlayerCorners(player2, player2Corners);
 
         rotatePlayerCorners(player1, player1Corners);
         rotatePlayerCorners(player2, player2Corners);
 
-        if (isCornerColoringAllowed){
+        if (IS_CORNER_COLORING_ALLOWED){
             clearPane();
             drawPlayerCorners(player1, player1Corners);
             drawPlayerCorners(player2, player2Corners);
         }
     }
 
-    public void defineWallsCorners() {
+    private void defineWallsCorners() {
         calculateWallsCorners();
-        if (isCornerColoringAllowed) drawWallsCorners();
+        if (IS_CORNER_COLORING_ALLOWED) drawWallsCorners();
     }
 
     private void calculatePlayerCorners(Tank player, List<Vector2D> playerCorners) {
@@ -135,12 +145,17 @@ public class CollisionDetector {
             allWallsCorners.add(corner);
             battleField.getChildren().add(corner);
         }
-        if (isCollisionColoringAllowed){
+        if (IS_COLLISION_COLORING_ALLOWED){
             battleField.getChildren().remove(detectedCorner);
             battleField.getChildren().add(detectedCorner);
         }
     }
 
+    /**
+     * Checks if the given tanks is currently colliding with any wall or the other tank
+     * @param player the tank to check
+     * @return True if collision was detected, false otherwise
+     */
     public boolean isDetectedForPlayer(Tank player) {
         definePlayerCorners();
 
@@ -157,14 +172,14 @@ public class CollisionDetector {
             for (Vector2D playerCorner : playerCorners) {
                 Vector2D position = getPlayerCornerGlobalPosition(playerCorner, player);
                 if (wall.contains(new Point2D(position.x, position.y))) {
-                    if (isCollisionColoringAllowed) colourWallCollidedWith(wall);
+                    if (IS_COLLISION_COLORING_ALLOWED) colourWallCollidedWith(wall);
                     return true;
                 }
             }
         }
         for (Vector2D wallCorner : wallsCorners) {
             if (checkCircleIntersection(wallCorner.x, wallCorner.y, 0, playerCorners, player)) {
-                if (isCollisionColoringAllowed) colourCornerCollidedWith(wallCorner);
+                if (IS_COLLISION_COLORING_ALLOWED) colourCornerCollidedWith(wallCorner);
                 return true;
             }
         }
@@ -185,34 +200,50 @@ public class CollisionDetector {
         return false;
     }
 
-    public boolean isDetectedBulletHorizontal(Bullet bullet) {
+    /**
+     * Checks if the given bullet is currently colliding with any vertical wall.
+     * @param bullet the bullet to check
+     * @return True if collision was detected, false otherwise
+     */
+    public boolean isDetectedBulletVertical(Bullet bullet) {
         double x = bullet.position.x;
         double y = bullet.position.y;
         double r = bullet.radius;
         for (Rectangle wall : walls) {
             if (wall.contains(new Point2D(x + r, y)) ||
                     wall.contains(new Point2D(x - r, y))) {
-                if (isCollisionColoringAllowed) colourWallCollidedWith(wall);
+                if (IS_COLLISION_COLORING_ALLOWED) colourWallCollidedWith(wall);
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isDetectedBulletVertical(Bullet bullet) {
+    /**
+     * Checks if the given bullet is currently colliding with any horizontal wall.
+     * @param bullet the bullet to check
+     * @return True if collision was detected, false otherwise
+     */
+    public boolean isDetectedBulletHorizontal(Bullet bullet) {
         double x = bullet.position.x;
         double y = bullet.position.y;
         double r = bullet.radius;
         for (Rectangle wall : walls) {
             if (wall.contains(new Point2D(x, y + r)) ||
                     wall.contains(new Point2D(x, y - r))) {
-                if (isCollisionColoringAllowed) colourWallCollidedWith(wall);
+                if (IS_COLLISION_COLORING_ALLOWED) colourWallCollidedWith(wall);
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * Checks if the given bullet is currently colliding with the given tank.
+     * @param bullet the bullet to check
+     * @param player the tank to check against
+     * @return True if collision was detected, false otherwise
+     */
     public boolean isDetectedBulletWithPlayer(Bullet bullet, Tank player) {
         definePlayerCorners();
         List<Vector2D> playerCorners = player1Corners;

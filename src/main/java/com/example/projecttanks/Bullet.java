@@ -69,9 +69,9 @@ public class Bullet extends Projectile {
     public void calculatePosition(double dt) {
         Vector2D currentPosition = new Vector2D(position.x, position.y);
         position = currentPosition.getAdded(velocity.getMultiplied(dt));
-        if (collision.isDetectedBulletHorizontal(this))
-            velocity.x *= -1;
         if (collision.isDetectedBulletVertical(this))
+            velocity.x *= -1;
+        if (collision.isDetectedBulletHorizontal(this))
             velocity.y *= -1;
         if (collision.isDetectedBulletWithPlayer(this, battleField.firstPlayer)){
             kill(battleField.firstPlayer);
