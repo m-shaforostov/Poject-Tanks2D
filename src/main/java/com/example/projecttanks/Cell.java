@@ -6,33 +6,52 @@ import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a single cell in the battlefield grid.
+ * Stores its position, size, configuration of walls and JavaFx shapes as a graphical representation.
+ */
 public class Cell {
-    public int x; // cells
-    public int y; // cells
-    public Vector2D position; // pixels
-    public double size = 0;
+    private final int x; // cells
+    private final int y; // cells
+    private Vector2D position; // pixels
+    private double size = 0;
 
+    /**
+     * Tells whether the cell was visited while the process of maze generation (backtracking) or not
+     */
     public boolean isVisited = false;
+
+    /**
+     * Tells whether the cell is chosen to be closed (won't be connected to other cells)
+     */
     public boolean isClosed = false;
 
-    public boolean wallTop = true;
-    public boolean wallBottom = true;
-    public boolean wallLeft = true;
-    public boolean wallRight = true;
+    private boolean wallTop = true;
+    private boolean wallBottom = true;
+    private boolean wallLeft = true;
+    private boolean wallRight = true;
 
-    public Rectangle wallTopR = new Rectangle();
-    public Rectangle wallBottomR = new Rectangle();
-    public Rectangle wallLeftR = new Rectangle();
-    public Rectangle wallRightR = new Rectangle();
+    private final Rectangle wallTopR = new Rectangle();
+    private final Rectangle wallBottomR = new Rectangle();
+    private final Rectangle wallLeftR = new Rectangle();
+    private final Rectangle wallRightR = new Rectangle();
 
-    public Rectangle[] walls;
-    public Rectangle cell;
+    private Rectangle cell;
 
+    /**
+     * Background color of the cell
+     */
     public static Color BG_COLOR = Color.LIGHTGRAY;
-    private Color WALL_COLOR = Color.BLACK;
-    private double wallNarrowSide = 0.1;
-    private double wallWideSide = 1.1;
+    private static final Color WALL_COLOR = Color.BLACK;
+    private final double wallNarrowSide = 0.1;
+    private final double wallWideSide = 1.1;
 
+    /**
+     * Constructs a square cell with a given size and location in the grid
+     * @param x the cell's X coordinate in the grid
+     * @param y the cell's Y coordinate in the grid
+     * @param size the size of the cell's side in pixels
+     */
     Cell(int x, int y, double size) {
         this.x = x;
         this.y = y;
@@ -40,14 +59,24 @@ public class Cell {
         this.size = size;
     }
 
+    /**
+     * @return the cell's X coordinate in the grid
+     */
     public int getX(){
         return x;
     }
 
+    /**
+     * @return the cell's Y coordinate in the grid
+     */
     public int getY(){
         return y;
     }
 
+    /**
+     * Sets needed boolean variables to the default values.
+     * Used before maze regeneration
+     */
     public void reset(){
         isVisited = false;
         isClosed = false;
@@ -57,27 +86,50 @@ public class Cell {
         wallRight = true;
     }
 
+    /**
+     * Sets value for the boolean variable, which represents whether the top wall of the cell will be displayed
+     * @param wall_top is the top wall displayed in the grid
+     */
     public void setWallTop(boolean wall_top){
         this.wallTop = wall_top;
     }
 
+    /**
+     * Sets value for the boolean variable, which represents whether the bottom wall of the cell will be displayed
+     * @param wall_bottom is the bottom wall displayed in the grid
+     */
     public void setWallBottom(boolean wall_bottom){
         this.wallBottom = wall_bottom;
     }
 
+    /**
+     * Sets value for the boolean variable, which represents whether the left wall of the cell will be displayed
+     * @param wall_left is the left wall displayed in the grid
+     */
     public void setWallLeft(boolean wall_left){
         this.wallLeft = wall_left;
     }
 
+    /**
+     * Sets value for the boolean variable, which represents whether the right wall of the cell will be displayed
+     * @param wall_right is the right wall displayed in the grid
+     */
     public void setWallRight(boolean wall_right){
         this.wallRight = wall_right;
     }
 
+    /**
+     * Initializes all elements of the cell (background cell and walls' rectangles).
+     * Doesn't draw bottom and right walls if the cell is located far from the broad.
+     * If the cell is located close to the broad it shows bottom and right walls to constract the border
+     * @param drawBorderWalls tells whether we should draw bottom and right walls.
+     * @return list of Rectangles each represents the cell itself ir the wall
+     */
     public List<Rectangle> initElements( boolean drawBorderWalls ){
         List<Rectangle> elements = new ArrayList<>();
 
         cell = new Rectangle();
-        updateCell();
+        updateCellRect();
         elements.add(cell);
 
         updateWalls();
@@ -124,14 +176,18 @@ public class Cell {
         wallRightR.setFill(WALL_COLOR);
     }
 
+    /**
+     * Saves given size and calculates new position accordingly to the position in th grid and the size of the cell
+     * @param size the new size value in px
+     */
     public void updateSize(double size) {
         this.size = size;
         this.position = new Vector2D(x * size, y * size);
-        updateCell();
+        updateCellRect();
         updateWalls();
     }
 
-    public void updateCell() {
+    private void updateCellRect() {
         cell.setWidth(size);
         cell.setHeight(size);
         cell.setX(position.x);
@@ -149,6 +205,9 @@ public class Cell {
         updateWallRight(x, y);
     }
 
+    /**
+     * Sets variable value to true, saying that this cell was visited while maze generation process (backtracking)
+     */
     public void setVisited() {
         isVisited = true;
     }

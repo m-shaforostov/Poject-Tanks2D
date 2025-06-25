@@ -344,4 +344,9 @@ public class BattleField extends Pane {
      * @return list of the walls (Rectangles)
      */
     public List<Rectangle> getWalls() {return walls;}
+
+    /**
+     * @return instance of the {@link CollisionDetector}
+     */
+    public CollisionDetector getCollisionDetector() {return collisionDetector;}
 }

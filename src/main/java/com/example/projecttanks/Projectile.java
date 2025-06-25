@@ -17,7 +17,7 @@ public abstract class Projectile {
         this.player = player;
         this.battleField = battleField;
         this.gameState = battleField.gameState;
-        this.collision = battleField.collisionDetector;
+        this.collision = battleField.getCollisionDetector();
     }
 
     public double getX() {
