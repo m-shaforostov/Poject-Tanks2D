@@ -320,6 +320,7 @@ public class BattleField extends Pane {
         setCellSize();
         updateCellSize();
         updatePlayers();
+        if (collisionDetector != null) collisionDetector.defineWallsCorners();
     }
 
     private void updatePlayers() {

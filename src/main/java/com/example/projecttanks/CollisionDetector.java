@@ -61,7 +61,11 @@ public class CollisionDetector {
         }
     }
 
-    private void defineWallsCorners() {
+    /**
+     * Calculates all corners for every wall on the battlefield.
+     * If corner coloring is allowed by IS_CORNER_COLORING_ALLOWED constant, draws red circles to mark those corners.
+     */
+    public void defineWallsCorners() {
         calculateWallsCorners();
         if (IS_CORNER_COLORING_ALLOWED) drawWallsCorners();
     }
