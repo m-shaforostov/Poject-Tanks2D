@@ -1,5 +1,7 @@
 package com.example.projecttanks;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 
@@ -23,14 +25,18 @@ public class BattleField extends Pane {
 
     private Cell[][] field;
     private static final int[] dimensions = new int[]{3, 4, 5, 6, 7, 8, 9, 10};
-    private int fieldWidth;
-    private int fieldHeight;
+    /** Width of the field in cells' number */
+    public int fieldWidth;
+    /** Height of the field in cells' number */
+    public int fieldHeight;
     private double cellSize;
 
     private final List<Rectangle> walls = new ArrayList<>();
+    private final List<BonusBox> bonuses = new ArrayList<>();
 
     private static final int closedCellRate = 30;
     private static final Random rand = new Random();
+    private int bonusAppearanceCountDown = 5;
 
     /**
      * Instance of the {@link Tank}.
@@ -100,6 +106,39 @@ public class BattleField extends Pane {
                 secondPlayer.setPosition((secondPlayerX - 0.5) * cellSize, (secondPlayerY - 0.5) * cellSize);
                 break;
             }
+        }
+    }
+
+    public void updateBonusAppearanceCountDown(){
+        bonusAppearanceCountDown--;
+        System.out.println(bonusAppearanceCountDown);
+        if (bonusAppearanceCountDown <= 0) {
+            resetBonusAppearance();
+            Vector2D position = generateBonusPosition();
+            bonuses.add(new BonusBox(this, (int) position.x, (int) position.y));
+            System.out.println("Generated on: " + position.x + ", " + position.y);
+        }
+    }
+
+    public void resetBonusAppearance() {
+        bonusAppearanceCountDown = 5;
+        bonuses.clear();
+    }
+
+    private Vector2D generateBonusPosition() {
+        while (true){
+            int cellX = rand.nextInt(fieldWidth);
+            int cellY = rand.nextInt(fieldHeight);
+            if (!field[cellX][cellY].isClosed) {
+                return new Vector2D(cellX, cellY);
+            }
+        }
+    }
+
+    public void updateBonuses(){
+        for (BonusBox bonusBox : bonuses) {
+            bonusBox.update();
+            bonusBox.draw();
         }
     }
 
@@ -282,6 +321,7 @@ public class BattleField extends Pane {
         generateMaze();
         draw();
         initPlayers();
+        resetBonusAppearance();
     }
 
     private void resetCells() {
@@ -320,6 +360,7 @@ public class BattleField extends Pane {
         setCellSize();
         updateCellSize();
         updatePlayers();
+        updateBonuses();
         if (collisionDetector != null) collisionDetector.defineWallsCorners();
     }
 
@@ -349,4 +390,6 @@ public class BattleField extends Pane {
      * @return instance of the {@link CollisionDetector}
      */
     public CollisionDetector getCollisionDetector() {return collisionDetector;}
+
+    public List<BonusBox> getBonuses() { return bonuses; }
 }

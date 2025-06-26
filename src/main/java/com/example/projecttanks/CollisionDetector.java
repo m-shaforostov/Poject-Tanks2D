@@ -17,10 +17,12 @@ public class CollisionDetector {
     private final BattleField battleField;
     private final Tank player1, player2;
     private final List<Rectangle> walls;
+    private List<BonusBox> bonusesBoxes;
 
     private final List<Vector2D> player1Corners = new ArrayList<>();
     private final List<Vector2D> player2Corners = new ArrayList<>();
     private final List<Vector2D> wallsCorners = new ArrayList<>();
+    private final List<Vector2D> bonusesCorners = new ArrayList<>();
 
     private final List<Circle> allPlayersCorners = new ArrayList<>();
     private final List<Circle> allWallsCorners = new ArrayList<>();
@@ -42,22 +44,40 @@ public class CollisionDetector {
         this.player1 = player1;
         this.player2 = player2;
         this.walls = battleField.getWalls();
+        this.bonusesBoxes = battleField.getBonuses();
 
         definePlayerCorners();
         defineWallsCorners();
+        defineBonusCorners();
     }
 
     private void definePlayerCorners() {
-        calculatePlayerCorners(player1, player1Corners);
-        calculatePlayerCorners(player2, player2Corners);
+        calculateRectangleObjCorners(player1.getPosition(), player1.getLength(), player1.getWidth(), player1Corners);
+        calculateRectangleObjCorners(player2.getPosition(), player2.getLength(), player2.getWidth(), player2Corners);
 
-        rotatePlayerCorners(player1, player1Corners);
-        rotatePlayerCorners(player2, player2Corners);
+        rotateRectangleObjCorners(player1.getAngle(), player1Corners);
+        rotateRectangleObjCorners(player2.getAngle(), player2Corners);
 
         if (IS_CORNER_COLORING_ALLOWED){
             clearPane();
-            drawPlayerCorners(player1, player1Corners);
-            drawPlayerCorners(player2, player2Corners);
+            drawObjCorners(player1.getPosition(), player1Corners);
+            drawObjCorners(player2.getPosition(), player2Corners);
+        }
+    }
+
+    /**
+     * Calculates all corners for every bonus on the battlefield.
+     * If corner coloring is allowed by IS_CORNER_COLORING_ALLOWED constant, draws red circles to mark those corners.
+     */
+    public void defineBonusCorners() {
+        for (BonusBox bonusBox : bonusesBoxes) {
+            calculateRectangleObjCorners(bonusBox.getPosition(),
+                    bonusBox.getWidth(), bonusBox.getHeight(), bonusesCorners);
+
+            rotateRectangleObjCorners(bonusBox.getAngle(), bonusesCorners);
+            if (IS_CORNER_COLORING_ALLOWED){
+                drawObjCorners(bonusBox.getPosition(), bonusesCorners);
+            }
         }
     }
 
@@ -70,11 +90,8 @@ public class CollisionDetector {
         if (IS_CORNER_COLORING_ALLOWED) drawWallsCorners();
     }
 
-    private void calculatePlayerCorners(Tank player, List<Vector2D> playerCorners) {
+    private void calculateRectangleObjCorners(Vector2D position, double width, double height, List<Vector2D> playerCorners) {
         playerCorners.clear();
-        Vector2D position = player.getPosition();
-        double width = player.getLength();
-        double height = player.getWidth();
         Vector2D defaultLeftTopCorner = new Vector2D(position.x - width / 2, position.y - height / 2);
         Vector2D defaultLeftBottomCorner = new Vector2D(position.x - width / 2, position.y + height / 2);
         Vector2D defaultRightTopCorner = new Vector2D(position.x + width / 2, position.y - height / 2);
@@ -85,29 +102,28 @@ public class CollisionDetector {
         playerCorners.add(defaultRightBottomCorner.getSubtracted(position));
     }
 
-    private void rotatePlayerCorners(Tank player, List<Vector2D> playerCorners) {
-        double angle = player.getAngle();
+    private void rotateRectangleObjCorners(double angle, List<Vector2D> playerCorners) {
         for (Vector2D playerCorner : playerCorners) {
             double defaultAngle = playerCorner.getAngle();
             playerCorner.setAngleAndLength(defaultAngle - Math.PI * angle / 180.0, playerCorner.getLength());
         }
     }
 
-    private Vector2D getPlayerCornerGlobalPosition(Vector2D playerRawCorner, Tank player) {
-        return playerRawCorner.getAdded(player.getPosition());
+    private Vector2D getCornerGlobalPosition(Vector2D objRawCorner, Vector2D objPosition) {
+        return objRawCorner.getAdded(objPosition);
     }
 
-    private List<Vector2D> getAllGlobalPositions(List<Vector2D> playerRawCorners, Tank player) {
+    private List<Vector2D> getAllGlobalPositions(List<Vector2D> objRawCorners, Vector2D objPosition) {
         List<Vector2D> globalPositions = new ArrayList<>();
-        for (Vector2D playerCorner : playerRawCorners) {
-            globalPositions.add(getPlayerCornerGlobalPosition(playerCorner, player));
+        for (Vector2D playerCorner : objRawCorners) {
+            globalPositions.add(getCornerGlobalPosition(playerCorner, objPosition));
         }
         return globalPositions;
     }
 
-    private void drawPlayerCorners(Tank player, List<Vector2D> playerCorners) {
-        for (Vector2D playerCorner : playerCorners) {
-            Vector2D position = getPlayerCornerGlobalPosition(playerCorner, player);
+    private void drawObjCorners(Vector2D objPosition, List<Vector2D> objCorners) {
+        for (Vector2D playerCorner : objCorners) {
+            Vector2D position = getCornerGlobalPosition(playerCorner, objPosition);
             Circle corner = new Circle(position.x, position.y, 3, Color.RED);
             corner.setStroke(Color.BLACK);
             corner.setStrokeWidth(1);
@@ -174,7 +190,7 @@ public class CollisionDetector {
 
         for (Rectangle wall : walls) {
             for (Vector2D playerCorner : playerCorners) {
-                Vector2D position = getPlayerCornerGlobalPosition(playerCorner, player);
+                Vector2D position = getCornerGlobalPosition(playerCorner, player.getPosition());
                 if (wall.contains(new Point2D(position.x, position.y))) {
                     if (IS_COLLISION_COLORING_ALLOWED) colourWallCollidedWith(wall);
                     return true;
@@ -189,14 +205,14 @@ public class CollisionDetector {
         }
 
         for (Vector2D corner : enemyCorners) {
-            Vector2D globalPosition = getPlayerCornerGlobalPosition(corner, enemy);
+            Vector2D globalPosition = getCornerGlobalPosition(corner, enemy.getPosition());
             if (checkCircleIntersection(globalPosition.x, globalPosition.y, 0, playerCorners, player)) {
                 return true;
             }
         }
 
         for (Vector2D corner : playerCorners) {
-            Vector2D globalPosition = getPlayerCornerGlobalPosition(corner, player);
+            Vector2D globalPosition = getCornerGlobalPosition(corner, player.getPosition());
             if (checkCircleIntersection(globalPosition.x, globalPosition.y, 0, enemyCorners, enemy)) {
                 return true;
             }
@@ -257,7 +273,7 @@ public class CollisionDetector {
     }
 
     private boolean checkCircleIntersection(double circleX, double circleY, double radius, List<Vector2D> playerRawCorners, Tank player) {
-        List<Vector2D> playerCorners = getAllGlobalPositions(playerRawCorners, player);
+        List<Vector2D> playerCorners = getAllGlobalPositions(playerRawCorners, player.getPosition());
         PointsProjection projection = new PointsProjection(circleX, circleY, radius, playerCorners, player.getAngle());
         return projection.isWithinBoundsX() && projection.isWithinBoundsY();
     }

@@ -128,6 +128,7 @@ public class MainGame extends Application {
         Timeline timeline = new Timeline(new KeyFrame(new Duration(1000), e -> {
             if (getAppState() == AppState.GAME){
                 time++;
+                battleField.updateBonusAppearanceCountDown();
                 if (battleField.gameState.isRoundOver) battleField.gameState.decrementCountDown();
             }
         }));
@@ -225,6 +226,7 @@ public class MainGame extends Application {
         updateMargin();
         battleField.draw();
         battleField.initPlayers();
+        battleField.resetBonusAppearance();
         resetTime();
         updateLabels();
         setAppState(AppState.GAME);
@@ -366,6 +368,7 @@ public class MainGame extends Application {
                 battleField.secondPlayer.move(REFRESH_TIME_MS / 1000);
                 battleField.secondPlayer.updateProjectile(REFRESH_TIME_MS / 1000);
 
+                battleField.updateBonuses();
                 updateLabels();
             } else if (getAppState() == AppState.END){
                 updateLabels();
