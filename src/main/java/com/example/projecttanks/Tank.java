@@ -54,7 +54,7 @@ public class Tank {
     /**
      * Constructs the tank.
      * Sets the player it is connected to and color based on the player given.
-     * Saves battlefield pane for later work.
+     * Saves battlefield pane for later work and creates new instance of {@link SoundPlayer} to manage sounds.
      * Sets the size of the tank and initiate rotation transformation for each visual component.
      * @param player the {@link Player} of the tank
      * @param battleField the {@link BattleField} where the tank has to be displayed

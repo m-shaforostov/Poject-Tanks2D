@@ -20,7 +20,7 @@ public class Bullet extends Projectile {
     private static final double disappearanceTime = 0.1;
     private double disappearanceStep;
 
-    private SoundPlayer soundPlayer = new SoundPlayer();
+    private final SoundPlayer soundPlayer = new SoundPlayer();
 
     /**
      * Constructs a bullet at the given position and velocity vector

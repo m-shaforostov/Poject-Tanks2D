@@ -65,8 +65,6 @@ public class BattleField extends Pane {
      * Draws tanks on the battlefield and sets up a collision detection mechanism for both of them.
      */
     public void initPlayers() {
-        SoundPlayer soundPlayer = new SoundPlayer();
-
         firstPlayer = new Tank(Player.ONE, this);
         secondPlayer = new Tank(Player.TWO, this);
 
