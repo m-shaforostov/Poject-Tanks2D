@@ -20,6 +20,8 @@ public class Bullet extends Projectile {
     private static final double disappearanceTime = 0.1;
     private double disappearanceStep;
 
+    private SoundPlayer soundPlayer = new SoundPlayer();
+
     /**
      * Constructs a bullet at the given position and velocity vector
      * @param position the starting position of the bullet
@@ -69,10 +71,14 @@ public class Bullet extends Projectile {
     public void calculatePosition(double dt) {
         Vector2D currentPosition = new Vector2D(position.x, position.y);
         position = currentPosition.getAdded(velocity.getMultiplied(dt));
-        if (collision.isDetectedBulletVertical(this))
+        if (collision.isDetectedBulletVertical(this)){
             velocity.x *= -1;
-        if (collision.isDetectedBulletHorizontal(this))
+            soundPlayer.playBulletBounce();
+        }
+        if (collision.isDetectedBulletHorizontal(this)){
             velocity.y *= -1;
+            soundPlayer.playBulletBounce();
+        }
         if (collision.isDetectedBulletWithPlayer(this, battleField.firstPlayer)){
             kill(battleField.firstPlayer);
         }

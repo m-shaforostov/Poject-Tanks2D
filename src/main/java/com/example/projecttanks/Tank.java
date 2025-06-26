@@ -49,6 +49,7 @@ public class Tank {
     private double muzzleLengthCoefficient;
 
     private final BattleField battleField;
+    private final SoundPlayer soundPlayer;
 
     /**
      * Constructs the tank.
@@ -61,6 +62,9 @@ public class Tank {
     Tank(Player player, BattleField battleField) {
         this.player = player;
         this.battleField = battleField;
+        this.soundPlayer = new SoundPlayer();
+        soundPlayer.playTankLand();
+
         color = player == Player.ONE ? Color.RED : Color.GREEN;
 
         updateSize();
@@ -244,7 +248,10 @@ public class Tank {
      */
     public void shoot() {
         if (isDead) return;
-        if (projectilesCount == 0) return;
+        if (projectilesCount == 0) {
+            soundPlayer.playEmptyBarrel();
+            return;
+        };
         Vector2D deltaPosition = new Vector2D();
         deltaPosition.setAngleAndLength(-Math.PI * angle / 180.0, length * muzzleLengthCoefficient);
 
@@ -252,6 +259,8 @@ public class Tank {
         velocity.setAngleAndLength(-Math.PI * angle / 180.0, bulletSpeedLimit);
         firedProjectiles.add(new Bullet(position.getAdded(deltaPosition), velocity, this, battleField));
         projectilesCount--;
+
+        soundPlayer.playFireBullet();
     }
 
     /**
@@ -294,9 +303,11 @@ public class Tank {
      * Used when the tank collided with a projectile
      */
     public void die() {
+        if (isDead) return;
         isDead = true;
         color = Color.rgb(70, 70, 70);
         update();
+        soundPlayer.playTankExplosion();
     }
 
     /**
